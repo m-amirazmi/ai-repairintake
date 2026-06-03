@@ -51,7 +51,7 @@ The mobile app uses **NativeWind** (Tailwind CSS for React Native) with **React 
 | `expo-camera` | ~14.1 | Camera capture |
 | `expo-image-picker` | ~15.0 | Image picker fallback |
 | `expo-image-manipulator` | ~12.0 | Image resize/compression |
-| `expo-av` | ~14.0 | Audio recording (Month 5) |
+| `expo-av` | ~14.0 | Audio recording (voice intake, voice notes) |
 
 ### Native Features
 
@@ -61,6 +61,8 @@ The mobile app uses **NativeWind** (Tailwind CSS for React Native) with **React 
 | `expo-haptics` | ~13.0 | Haptic feedback |
 | `@react-native-async-storage/async-storage` | ^1.23 | Local storage |
 | `expo-secure-store` | ~13.0 | Secure token storage |
+| `react-native-qrcode-svg` | latest | QR code generation for receipts |
+| `react-native-svg` | latest | SVG rendering (required by qrcode) |
 
 ---
 

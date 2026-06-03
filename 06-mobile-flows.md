@@ -428,7 +428,276 @@ After staff (who is a technician) submits a new ticket:
 
 ---
 
-## Navigation Structure
+## Flow F: Quick Repair (Technician at Counter)
+
+```
+┌─────────────────────────────────────────┐
+│  ←  Baiki Cepat                         │
+│                                         │
+│  ── Peranti ──                          │
+│  ┌─────────────────────────────────┐    │
+│  │ 🔍 iPh                           │    │
+│  │    ↓                             │    │
+│  │ 📱 iPhone 14 Pro                 │    │
+│  │ 📱 iPhone 14 Pro Max             │    │
+│  │ 📱 iPhone 14                     │    │
+│  │    (typeahead, 2-3 chars)        │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ── Masalah ──                          │
+│  ┌─────────────────────────────────┐    │
+│  │ 📋 Penukaran Skrin OLED    ▼    │    │
+│  │     RM350 | 0.75 jam            │    │
+│  │                                 │    │
+│  │ 📋 Penukaran Bateri       ▼    │    │
+│  │     RM150 | 0.5 jam             │    │
+│  │                                 │    │
+│  │ 📋 Port Pengecas           ▼    │    │
+│  │     RM89  | 0.5 jam             │    │
+│  │    (top-10 common issues)       │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ── Pelanggan (Pilihan) ──              │
+│  Nama:     [           ]                │
+│  Telefon:  [+60_______ ]                │
+│  (Jika kosong, resit dengan kod QR)     │
+│                                         │
+│  ── Harga ──                            │
+│  ┌─────────────────────────────────┐    │
+│  │ Bahagian (1):     RM 339.00     │    │
+│  │ Upah (0.75j):     RM  11.00     │    │
+│  │                   ────────      │    │
+│  │ JUMLAH:           RM 350.00     │    │
+│  │ [edit jika perlu]              │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │    [HANTAR & CETAK RESIT]       │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  Pembaikan akan dimulakan serta-merta.  │
+└─────────────────────────────────────────┘
+
+After submit (with phone):
+┌─────────────────────────────────────────┐
+│  ✅ Tiket #D1-043 — Baiki Cepat         │
+│                                         │
+│  iPhone 14 Pro — Penukaran Skrin        │
+│  Harga: RM350                           │
+│                                         │
+│  WhatsApp resit dihantar ke             │
+│  +6012-345-6789                         │
+│                                         │
+│  Status: Dalam Proses                   │
+│  Anggaran siap: 3:30 PM                 │
+│                                         │
+│       [Buka Tiket]   [Baiki Cepat Baru] │
+└─────────────────────────────────────────┘
+
+After submit (no phone):
+┌─────────────────────────────────────────┐
+│  ✅ Tiket #D1-043 — Baiki Cepat         │
+│                                         │
+│  iPhone 14 Pro — Penukaran Skrin        │
+│  Harga: RM350                           │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │                                 │    │
+│  │        ████████████████         │    │
+│  │        ██  QR CODE  ██         │    │
+│  │        ████████████████         │    │
+│  │                                 │    │
+│  │   Imbas untuk kemaskini         │    │
+│  │   WhatsApp & status             │    │
+│  │                                 │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  Status: Dalam Proses                   │
+│                                         │
+│       [Buka Tiket]   [Baiki Cepat Baru] │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Flow G: Voice Intake
+
+```
+┌─────────────────────────────────────────┐
+│  ←  Ambil Suara                         │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │                                 │    │
+│  │           🎤                    │    │
+│  │                                 │    │
+│  │    Ketuk untuk rakam            │    │
+│  │                                 │    │
+│  │  "iPhone 14 Pro skrin pecah,    │    │
+│  │   Ahmad, tiga ratus lima puluh" │    │
+│  │                                 │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ── Sedang mendengar... ──              │
+│  ┌─────────────────────────────────┐    │
+│  │  🔴 Merakam...  00:04           │    │
+│  │  ─────────────────────────────   │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ── Dikenal pasti ──                    │
+│  ┌─────────────────────────────────┐    │
+│  │ ✅ Peranti:  iPhone 14 Pro       │    │
+│  │ ✅ Masalah:  Skrin pecah         │    │
+│  │ ✅ Pelanggan: Ahmad              │    │
+│  │ ✅ Harga:    RM350               │    │
+│  │                                  │    │
+│  │ Keyakinan: 91%                   │    │
+│  │                                  │    │
+│  │ "iPhone 14 Pro skrin pecah,      │    │
+│  │  Ahmad, tiga ratus lima puluh"   │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │    [HANTAR TIKET]               │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  [Rakam Semula]                         │
+└─────────────────────────────────────────┘
+
+Accessible from:
+  - Home screen FAB (long press → "Baiki Cepat / Ambil Suara")
+  - Quick Repair screen (🎤 button in header)
+  - Full AI New Ticket screen (🎤 button in customer notes section)
+```
+
+---
+
+## Flow H: Payment & Receipt (at Completion)
+
+```
+┌─────────────────────────────────────────┐
+│  ←  Tiket #D1-043 — Pembayaran          │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │ iPhone 14 Pro                   │    │
+│  │ Penukaran Skrin OLED            │    │
+│  │                                 │    │
+│  │ Bahagian (1):    RM 339.00      │    │
+│  │ Upah (0.75j):   RM  11.00       │    │
+│  │                   ────────      │    │
+│  │ JUMLAH:          RM 350.00      │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ── Bayaran ──                          │
+│  ┌─────────────────────────────────┐    │
+│  │ Amaun:  [ 350.00 ]              │    │
+│  │                                 │    │
+│  │ Kaedah:                         │    │
+│  │  ○ Tunai                        │    │
+│  │  ● QR Pay                       │    │
+│  │  ○ Bank Transfer                │    │
+│  │                                 │    │
+│  │ Nota: [____________________]    │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  [SAHKAN BAYARAN & SELESAI]     │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  Stok dikemaskini: -1 Skrin OLED        │
+└─────────────────────────────────────────┘
+
+After payment (phone exists):
+┌─────────────────────────────────────────┐
+│  ✅ Pembayaran Diterima                 │
+│                                         │
+│  RM350 — QR Pay                         │
+│  Tiket #D1-043 — Selesai                │
+│                                         │
+│  WhatsApp resit dihantar kepada         │
+│  +6012-345-6789                         │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │ 📋 Resit WhatsApp:              │    │
+│  │                                  │    │
+│  │ 🔧 Repair Intake                │    │
+│  │ Tiket #D1-043                   │    │
+│  │ iPhone 14 Pro — Penukaran Skrin │    │
+│  │ Jumlah: RM350 (QR Pay)          │    │
+│  │ Dungun 1                        │    │
+│  │ Terima kasih!                   │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│       [Kembali ke Senarai]              │
+└─────────────────────────────────────────┘
+
+After payment (no phone — QR receipt):
+┌─────────────────────────────────────────┐
+│  ✅ Pembayaran Diterima                 │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │                                 │    │
+│  │        ████████████████         │    │
+│  │        ██  QR CODE  ██         │    │
+│  │        ████████████████         │    │
+│  │                                 │    │
+│  │   Tunjukkan QR ini kepada       │    │
+│  │   pelanggan                     │    │
+│  │                                 │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│       [Kembali ke Senarai]              │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Flow I: Public Ticket Web View (Customer QR Link)
+
+```
+Customer scans QR code → opens repairintake.my/t/abc123xy
+
+┌─────────────────────────────────────────┐
+│  🔧 Repair Intake                       │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │                                 │    │
+│  │ Tiket #D1-043                   │    │
+│  │ iPhone 14 Pro                   │    │
+│  │ Penukaran Skrin OLED            │    │
+│  │                                 │    │
+│  │ Status: ✅ Selesai              │    │
+│  │ Cawangan: Dungun 1              │    │
+│  │ No. 23, Jalan Besar             │    │
+│  │                                 │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ── Mahu kemaskini WhatsApp? ──         │
+│  ┌─────────────────────────────────┐    │
+│  │ Nama:    [Ahmad           ]     │    │
+│  │ Telefon: [+6012-345-6789 ]     │    │
+│  │                                 │    │
+│  │ [Langgan WhatsApp]              │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  Kami akan hantar kemaskini status      │
+│  melalui WhatsApp.                      │
+└─────────────────────────────────────────┘
+
+After subscribing:
+┌─────────────────────────────────────────┐
+│  ✅ Berjaya!                            │
+│                                         │
+│  WhatsApp kemaskini akan dihantar       │
+│  ke +6012-345-6789                      │
+│                                         │
+│  Semak WhatsApp anda untuk kemaskini    │
+│  seterusnya.                            │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Navigation Structure (Updated)
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -439,7 +708,8 @@ After staff (who is a technician) submits a new ticket:
 │   └────┘  └────────┘  └────────┘  └──────┘      │
 │                                                 │
 │  Tab 1: JOBS (home)                             │
-│  ├── Quick Intake button (prominent at top)     │
+│  ├── FAB: Tiket Baharu (Full AI)                │
+│  ├── FAB long-press: Baiki Cepat / Ambil Suara  │
 │  ├── Today's queue (live list)                  │
 │  └── My assigned tickets (technician)           │
 │                                                 │
@@ -459,16 +729,20 @@ After staff (who is a technician) submits a new ticket:
 └─────────────────────────────────────────────────┘
 ```
 
-## Key Design Patterns
+## Key Design Patterns (Updated)
 
-1. **Camera-first**: The camera capture area is the most prominent element on the new ticket screen. No hunting through menus.
+1. **Graduated entry points**: FAB single-tap opens Full AI intake. Long-press shows Quick Repair / Voice Intake. Role-aware: technicians see all three, front desk sees Full AI only.
 
-2. **Suggestion chips**: AI suggestions are tappable pills, not dropdown menus. Faster than typing or scrolling.
+2. **Camera-first**: The camera capture area is the most prominent element on the new ticket screen. No hunting through menus.
 
-3. **Confidence display**: Every AI result shows a confidence percentage. Staff know when to trust or override.
+3. **Suggestion chips**: AI suggestions are tappable pills, not dropdown menus. Quick Repair uses typeahead + quick-select, Voice uses speech. Faster than typing or scrolling.
 
-4. **Autosave**: Assessment drafts autosave every 30 seconds. No lost work if the app backgrounds.
+4. **Confidence display**: Every AI result shows a confidence percentage. Staff know when to trust or override.
 
-5. **Pull-to-refresh → Real-time**: Initially pull-to-refresh the queue. Upgrade to Supabase Realtime subscriptions (Month 3) for live updates without user action.
+5. **Autosave**: Assessment drafts autosave every 30 seconds. No lost work if the app backgrounds.
 
-6. **Offline queue**: If no internet, tickets queue locally in AsyncStorage and sync when connection returns.
+6. **Pull-to-refresh → Real-time**: Initially pull-to-refresh the queue. Upgrade to Supabase Realtime subscriptions (Month 3) for live updates without user action.
+
+7. **Offline queue**: If no internet, tickets queue locally in AsyncStorage and sync when connection returns.
+
+8. **QR receipt for anonymous repairs**: When no phone number provided, a QR code links to a public ticket page. Customer can subscribe to WhatsApp updates at any time via the QR link.

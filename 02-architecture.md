@@ -14,8 +14,8 @@
 │  │  Queue view          │  │  Catalog management  │  │                    │ │
 │  │  Assessment          │  │  Staff management    │  │                    │ │
 │  └──────────┬───────────┘  └──────────┬───────────┘  └──────────┬─────────┘ │
-│             │                         │                       │             │
-│             └─────────────┬───────────┴───────────────────────┘             │
+│             │                         │                         │           │
+│             └─────────────┬───────────┴─────────────────────────┘           │
 │                           │                                                 │
 │                    ┌──────┴──────┐                                          │
 │                    │  API LAYER  │                                          │
@@ -26,7 +26,7 @@
 │                           │                                                 │
 │        ┌──────────────────┼──────────────────┐                              │
 │        ▼                  ▼                  ▼                              │
-│  ┌──────────┐     ┌──────────────┐     ┌──────────────┐                    │
+│  ┌───────────┐     ┌──────────────┐     ┌──────────────┐                    │
 │  │  AI       │     │  CORE        │     │  EXTERNAL    │                    │
 │  │  SERVICE  │     │  SERVICES    │     │  SERVICES    │                    │
 │  │           │     │              │     │              │                    │
@@ -37,9 +37,9 @@
 │  │ Text      │     │ (Queue)      │     │              │                    │
 │  │ Whisper   │     │ File Storage │     │              │                    │
 │  │ (later)   │     │ (Supabase)   │     │              │                    │
-│  └──────────┘     └──────┬───────┘     └──────────────┘                    │
-│        │                  │                   │                              │
-│        └──────────────────┼───────────────────┘                              │
+│  └───────────┘     └──────┬───────┘     └──────────────┘                    │
+│        │                  │                   │                             │
+│        └──────────────────┼───────────────────┘                             │
 │                           ▼                                                 │
 │                    ┌──────────────┐                                         │
 │                    │   DATABASE   │                                         │
@@ -52,31 +52,77 @@
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Data Flow: New Ticket Creation
+## Data Flow: Graduated Intake (3 Tiers)
+
+### Tier 1: Voice Intake (<5 seconds)
+
+```
+STAFF     ──▶   TAP 🎤   ──▶   SPEAK    ──▶   AI        ──▶   CONFIRM   ──▶   TICKET
+OPENS           MIC          "iPhone          PARSE         (1 tap)         CREATED
+APP             BUTTON        14 Pro,         VOICE TO                      (auto-
+                              skrin           FIELDS                        approved)
+                              pecah,
+                              RM350"
+```
+
+### Tier 2: Quick Repair (<10 seconds)
+
+```
+STAFF     ──▶   TYPE     ──▶   SELECT   ──▶   TAP       ──▶   TICKET
+OPENS          "iPh..."        "Skrin         QUICK            CREATED
+APP            (3 chars)       Pecah"         SUBMIT           (auto-
+                → iPhone       (top-10        (price           approved,
+                14 Pro         common         auto-filled      in_progress)
+                auto-match)    issues)        from catalog)
+```
+
+### Tier 3: Full AI Intake (30-90 seconds) — existing flow
 
 ```
 STAFF     ──▶   PHOTO   ──▶   AI     ──▶   MATCH   ──▶   TICKET
 OPENS          CAPTURE       VISION        CATALOG        CREATED
 APP                           API
-
-                                                          │
-CUSTOMER  ◀──  WHATSAPP  ◀──  NOTIF   ◀──  SAVE    ◀─────┘
+                              │
+CUSTOMER  ◀──  WHATSAPP  ◀──  NOTIF   ◀──  SAVE    ◀────┘
 GETS            API            SERVICE       TO DB
 WHATAPP
+```
+
+## Data Flow: Payment & Receipt (at Completion)
+
+```
+TECH       ──▶   TAP        ──▶   PAYMENT   ──▶   CONFIRM   ──▶   PARTS
+MARKS            "SELESAI"        SCREEN          PAYMENT         DECREMENTED
+COMPLETE         (status:         SLIDES UP       (cash/QR/       INVENTORY
+                 completed)       auto-filled     bank)
+                                  amount,
+                                  select method
+                                                        │
+                                          ┌─────────────┴──────────────┐
+                                          │                            │
+                                    PHONE PROVIDED?              NO PHONE?
+                                          │                            │
+                                    ┌─────▼─────┐              ┌──────▼──────┐
+                                    │ WHATSAPP  │              │ QR RECEIPT  │
+                                    │ RECEIPT   │              │ SCREEN      │
+                                    │ SENT      │              │ (scan to    │
+                                    └───────────┘              │  subscribe) │
+                                                               └─────────────┘
+
 ```
 
 ## Data Flow: Technician Assessment
 
 ```
-TECH     ──▶   OPEN    ──▶   AI      ──▶   TECH    ──▶   SAVE    ──▶  WHATSAPP
-OPENS          TICKET        DIAGNOSE      SELECTS       ASSESS       TO CUST
-QUEUE                        API           DIAGNOSIS     MENT         (QUOTE)
+TECH      ──▶   OPEN    ──▶   AI       ──▶   TECH     ──▶   SAVE     ──▶   WHATSAPP
+OPENS           TICKET         DIAGNOSE        SELECTS        ASSESS          TO CUST
+QUEUE                          API             DIAGNOSIS      MENT            (QUOTE)
 
-                                                                │
-                                                        ┌───────▼────────┐
-                                                        │ CUSTOMER        │
-                                                        │ REPLIES YES/NO │
-                                                        └────────────────┘
+                                                                                   │
+                                                                          ┌────────┴────────┐
+                                                                          │ CUSTOMER         │
+                                                                          │ REPLIES YES/NO   │
+                                                                          └─────────────────┘
 ```
 
 ## Real-Time Queue (Month 3+)
@@ -84,67 +130,58 @@ QUEUE                        API           DIAGNOSIS     MENT         (QUOTE)
 Supabase Realtime broadcasts ticket status changes to all connected clients:
 
 ```
-┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│  TECHNICIAN  │◀────────│  SUPABASE    │◀────────│  FRONT DESK  │
-│  PHONE       │  WS PUSH│  REALTIME    │  UPDATE │  CREATES     │
-│  (listens)   │         │  (Postgres   │         │  TICKET      │
-│              │         │   changes)   │         │              │
-└──────────────┘         └──────────────┘         └──────────────┘
+┌─────────────────┐         ┌──────────────────┐         ┌─────────────────┐
+│  TECHNICIAN     │◀────────│    SUPABASE      │◀────────│   FRONT DESK    │
+│  PHONE          │  WS PUSH│    REALTIME      │  UPDATE │   CREATES       │
+│  (listens)      │         │  (Postgres       │         │   TICKET        │
+│                 │         │   changes)       │         │                 │
+└─────────────────┘         └──────────────────┘         └─────────────────┘
 ```
 
-## Role-Aware Unified Flow
+## Role-Aware Unified Flow (Updated)
 
 Any user can advance a ticket through any state based on their role.
-No enforced separate workflows — the ticket lifecycle is the single source of truth.
+Quick Repair and Voice Intake tickets skip assessment and auto-approve.
 
+```mermaid
+stateDiagram-v2
+    [*] --> RECEIVED: Full AI intake (front desk)
+    [*] --> IN_PROGRESS: Quick Repair / Voice (auto-approved)
+
+    RECEIVED --> ASSESSING: Technician starts assessment
+    ASSESSING --> ASSESSED: Technician saves diagnosis + quote
+    ASSESSED --> APPROVED: Customer replies YES (WhatsApp)
+    ASSESSED --> CANCELLED: Customer replies NO
+    RECEIVED --> CANCELLED: Customer changes mind
+    ASSESSING --> CANCELLED: Device beyond repair
+
+    APPROVED --> IN_PROGRESS: Technician starts repair
+    IN_PROGRESS --> COMPLETED: Repair done
+    COMPLETED --> PAID: Payment recorded
+    PAID --> PICKED_UP: Customer collects device
+
+    CANCELLED --> [*]
+    PICKED_UP --> [*]
 ```
-┌──────────┐     ┌──────────┐     ┌──────────┐
-│ RECEIVED │────▶│ASSESSING │────▶│ ASSESSED │
-│ (intake) │     │ (tech)   │     │ (priced) │
-└────┬─────┘     └──────────┘     └────┬─────┘
-     │                                 │
-     │  Front desk staff               │  Customer approves via WhatsApp
-     │  does this part                 │
-     │                                 ▼
-     │                          ┌──────────────┐
-     │  ──────────────────────▶ │  IN PROGRESS │
-     │  If tech is at counter,  │  (repairing) │
-     │  they flow straight      └──────┬───────┘
-     │  through both                   │
-     │                                 ▼
-     │                          ┌──────────────┐
-     │                          │  COMPLETED   │
-     │                          │  (done)      │
-     │                          └──────┬───────┘
-     │                                 │
-     │                                 ▼
-     │                          ┌──────────────┐
-     │                          │  PICKED UP   │
-     │                          │  (collected) │
-     │                          └──────────────┘
-     │
-     └──▶ Anyone with a phone can receive, anyone with tech role can assess.
-          The app shows the right UI for the right role at the right time.
-```
+
+**Quick Repair / Voice Intake path:**
+
+- Skips `received` → `assessing` → `assessed` → approval
+- Goes directly to `in_progress` (auto-approved, technician already verified at counter)
+- Payment recorded at `completed`, then `paid`, then `picked_up`
+
+**Full AI path:**
+
+- Front desk staff receives device, technician assesses, customer must approve via WhatsApp before repair begins
 
 ## Compressed Flow (Technician as Front Desk)
 
-When a technician handles intake directly:
+When a technician handles intake directly, the flow adapts to how well they already know the fix:
 
-```
-TECHNICIAN AT COUNTER:
-    1. Opens app → taps "New Ticket"
-    2. Snaps photo → AI identifies device
-    3. Enters customer info + notes
-    4. Submits (status: RECEIVED)
-    5. App prompts: "Assess now or add to queue?"
-    6. Taps "Assess Now"
-    7. Diagnoses, parts, pricing all in one flow
-    8. Saves assessment (status: ASSESSED)
-    9. WhatsApp quote sent to customer
-
-    Total time: 1-3 minutes for the entire intake + assessment cycle.
-```
+| Fix Known?                   | Path                  | Steps                                                                                                                                                          | Time    |
+| ---------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| Yes (known fix, known price) | Quick Repair or Voice | 1. Tap "Baiki Cepat" or 🎤 → 2. Speak/typeahead device + issue → 3. Confirm → ticket auto-approved, in progress                                                | <10 sec |
+| No (needs diagnosis)         | Full AI               | 1. Snap photo → AI ID → 2. Enter customer info → 3. Submit → 4. "Assess Now?" → 5. AI-suggested diagnosis → 6. Parts + pricing → 7. Save → WhatsApp quote sent | 1-3 min |
 
 ## Key Architecture Principles
 

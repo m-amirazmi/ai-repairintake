@@ -171,6 +171,215 @@ Update ticket status. Triggers notifications based on new status.
 }
 ```
 
+### POST /api/tickets/quick
+
+Create Quick Repair ticket. Typeahead device + quick-select issue + optional customer.
+Ticket auto-approved and set to `in_progress`.
+
+```json
+// Request
+{
+  "outlet_id": "uuid (required)",
+  "device_id": "uuid (required)",
+  "issue_id": "uuid (required)",
+  "customer_name": "(optional)",
+  "customer_phone": "(optional — if null, QR receipt generated)",
+  "price": 350.00,  // auto-filled from catalog, editable by technician
+  "notes": "Skrin pecah" (optional)
+}
+
+// Response 201
+{
+  "ticket": {
+    "id": "uuid",
+    "ticket_number": "D1-043",
+    "intake_type": "quick_repair",
+    "status": "in_progress",
+    "customer_approval": "auto_approved",
+    "qr_token": "abc123xy",
+    "device": { ... },
+    "receipt_url": "https://repairintake.my/t/abc123xy"
+  }
+}
+```
+
+### POST /api/tickets/voice
+
+Create ticket from voice audio. AI transcribes and extracts structured fields.
+
+```json
+// Request (multipart/form-data)
+{
+  "audio": <audio_file.wav>,
+  "outlet_id": "uuid (required)"
+}
+
+// Response 201
+{
+  "ticket": {
+    "id": "uuid",
+    "ticket_number": "D1-044",
+    "intake_type": "voice_intake",
+    "status": "in_progress",  // auto-approved if price is set
+    "device": { "id": "uuid", "model": "iPhone 14 Pro" },
+    "extracted": {
+      "device_model": "iPhone 14 Pro",
+      "issue": "Skrin pecah",
+      "customer_name": "Ahmad",
+      "price": 350.00,
+      "confidence": 0.91
+    },
+    "transcript": "iPhone 14 Pro skrin pecah, Ahmad, tiga ratus lima puluh"
+  }
+}
+```
+
+### POST /api/tickets/:id/payment
+
+Record payment for a completed ticket. Sends WhatsApp receipt or returns QR receipt URL.
+
+```json
+// Request
+{
+  "amount": 350.00,
+  "method": "cash",
+  "notes": "(optional)"
+}
+
+// Response 200
+{
+  "ticket": { ... },
+  "payment": {
+    "id": "uuid",
+    "amount": 350.00,
+    "method": "cash",
+    "difference_from_estimate": 0
+  },
+  "receipt": {
+    "sent_via": "whatsapp",  // or "qr_code" if no phone
+    "qr_url": "https://repairintake.my/t/abc123xy"  // if no phone
+  },
+  "inventory_updated": true
+}
+```
+
+### PATCH /api/tickets/:id/complete-with-payment
+
+Mark ticket completed and record payment in one call. For Quick Repair flow.
+
+```json
+// Request
+{
+  "amount": 350.00,
+  "method": "cash",
+  "repair_notes": "Penukaran skrin selesai"
+}
+
+// Response 200
+{
+  "ticket": { ..., "status": "paid" },
+  "payment": { ... },
+  "receipt_sent": true
+}
+```
+
+### GET /api/devices/:id/quick-issues
+
+Top-10 common issues for Quick Repair quick-select dropdown.
+
+```json
+// Response 200
+{
+  "device": { "id": "uuid", "model": "iPhone 14 Pro" },
+  "quick_issues": [
+    {
+      "issue_id": "uuid",
+      "issue_name": "Penukaran Skrin OLED",
+      "display_order": 1,
+      "default_price": 350.00,
+      "default_parts": [
+        { "part_id": "uuid", "part_name": "Skrin OLED + Digitizer", "unit_retail": 339.00 }
+      ],
+      "labor_hours": 0.75
+    },
+    {
+      "issue_id": "uuid",
+      "issue_name": "Penukaran Bateri",
+      "display_order": 2,
+      "default_price": 150.00,
+      "default_parts": [ ... ],
+      "labor_hours": 0.5
+    }
+  ]
+}
+```
+
+### GET /api/tickets/:token/public
+
+Public ticket view (used by QR code link). Returns minimal info — no internal notes, no cost prices.
+
+```json
+// Response 200
+{
+  "ticket": {
+    "ticket_number": "D1-043",
+    "status": "in_progress",
+    "device": { "model": "iPhone 14 Pro" },
+    "issue": "Penukaran Skrin",
+    "outlet": { "name": "Dungun 1", "address": "No. 23, Jalan Besar" },
+    "estimated_completion": "2026-06-03T15:30:00+08:00",
+    "can_subscribe": true  // if no phone linked yet
+  }
+}
+```
+
+### PATCH /api/tickets/:token/subscribe
+
+Customer subscribes via public ticket page — links their phone number to the ticket.
+
+```json
+// Request
+{
+  "name": "Ahmad",
+  "phone": "+6012-345-6789"
+}
+
+// Response 200
+{
+  "subscribed": true,
+  "message": "WhatsApp kemaskini akan dihantar ke +6012-345-6789"
+}
+```
+
+### POST /api/ai/parse-voice-intake
+
+Parse voice recording to extract ticket fields (device, issue, customer, price).
+
+```json
+// Request
+{
+  "audio_url": "https://storage.supabase.co/.../voice.wav",
+  "outlet_id": "uuid"
+}
+
+// Response 200
+{
+  "transcript": "iPhone 14 Pro skrin pecah, Ahmad, tiga ratus lima puluh",
+  "transcript_ms": "iPhone 14 Pro skrin pecah, Ahmad, tiga ratus lima puluh",
+  "extracted": {
+    "device_model": "iPhone 14 Pro",
+    "device_id": "uuid",
+    "device_confidence": 0.94,
+    "issue": "Skrin pecah",
+    "issue_id": "uuid",
+    "customer_name": "Ahmad",
+    "price": 350.00,
+    "price_confidence": 0.85,
+    "overall_confidence": 0.91
+  }
+}
+```
+
 ### PATCH /api/tickets/:id/approve
 
 Customer approval endpoint (called from WhatsApp webhook).

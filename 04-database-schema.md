@@ -15,11 +15,11 @@
                              │               │  (core)     │
                              │               └──┬──┬──┬──┬─┘
                              │                  │  │  │  │
-                             │1             ∞│   │  │∞ │∞
-                      ┌──────┴──────┐   ┌────┴┐ │  ┌┴──┴──────┐
-                      │ TICKET_     │   │ CUS-│ │  │  TICKET   │
-                      │ HISTORY     │   │TOME-│ │  │  HISTORY  │
-                      └─────────────┘   │ RS  │ │  └───────────┘
+                             │1             ∞│   │  │∞ │∞ │1
+                      ┌──────┴──────┐   ┌────┴┐ │  ┌┴──┴──────┐ ┌───────────┐
+                      │ TICKET_     │   │ CUS-│ │  │  TICKET   │ │ PAYMENTS  │
+                      │ HISTORY     │   │TOME-│ │  │  HISTORY  │ │ (receipt) │
+                      └─────────────┘   │ RS  │ │  └───────────┘ └───────────┘
                                         └─────┘ │
                     ┌───────────────────────────┘
                     │
@@ -27,13 +27,13 @@
            │  NOTIFICATIONS │
            └────────────────┘
 
-┌─────────┐     ┌─────────────┐     ┌─────────┐
-│ DEVICES │∞────│DEVICE_ISSUES│────∞│ ISSUES  │
-└─────────┘     └─────────────┘     └─────────┘
-     │
-     │∞
-     │
-┌─────────┐
+┌─────────┐     ┌─────────────┐     ┌─────────┐     ┌──────────────────┐
+│ DEVICES │∞────│DEVICE_ISSUES│────∞│ ISSUES  │     │ DEVICE_QUICK_    │
+└─────────┘     └─────────────┘     └─────────┘     │ ISSUES           │
+     │                                               │ (top-10 per      │
+     │∞                                              │  device, cached  │
+     │                                               │  for Quick Fix)  │
+┌─────────┐                                          └──────────────────┘
 │  PARTS  │ (tenant-managed)
 └─────────┘
 ```
@@ -158,9 +158,65 @@ Parts catalog managed by the business owner. Tenant-scoped.
 | created_at | timestamptz | DEFAULT now() |
 | updated_at | timestamptz | DEFAULT now() |
 
+### payments
+
+Payment records for completed tickets. One ticket can have one payment (MVP).
+
+| Column | Type | Constraints |
+|---|---|---|
+| id | uuid | PK, DEFAULT gen_random_uuid() |
+| ticket_id | uuid | FK → tickets.id, UNIQUE, NOT NULL |
+| amount | decimal(10,2) | NOT NULL |
+| method | enum | `cash`, `qr_pay`, `bank_transfer`, NOT NULL |
+| notes | text | |
+| received_by | uuid | FK → users.id, NOT NULL |
+| difference_from_estimate | decimal(10,2) | (e.g., -10.00 if discounted) |
+| created_at | timestamptz | DEFAULT now() |
+
+### device_quick_issues
+
+Pre-cached top common issues per device for the Quick Repair quick-select dropdown.
+Curated by the business owner via admin dashboard.
+
+| Column | Type | Constraints |
+|---|---|---|
+| id | uuid | PK, DEFAULT gen_random_uuid() |
+| device_id | uuid | FK → devices.id, NOT NULL |
+| issue_id | uuid | FK → issues.id, NOT NULL |
+| display_order | integer | NOT NULL DEFAULT 0 (sort order in quick-select list) |
+| default_parts | jsonb | Pre-selected parts for this fix (see below) |
+| default_price | decimal(10,2) | Cached total (parts + labor) for instant display |
+| default_labor_hours | decimal(3,1) | DEFAULT 0 |
+| is_active | boolean | DEFAULT true |
+| tenant_id | uuid | FK → tenants.id, NOT NULL |
+| created_at | timestamptz | DEFAULT now() |
+| updated_at | timestamptz | DEFAULT now() |
+
+**UNIQUE INDEX** on `(device_id, issue_id, tenant_id)`.
+
+### device_quick_issues.default_parts JSONB schema
+
+```json
+[
+  {
+    "part_id": "uuid",
+    "part_name": "Skrin OLED + Digitizer",
+    "quantity": 1,
+    "unit_retail": 339.00
+  },
+  {
+    "part_id": "uuid",
+    "part_name": "Gam perekat",
+    "quantity": 1,
+    "unit_retail": 11.00
+  }
+]
+```
+
 ### customers
 
 Customer records. Deduplicated by phone number within a tenant.
+**NOTE:** Anonymous Quick Repair tickets may have `customer_name` and `customer_phone` on the ticket directly without a `customers` record. If customer later subscribes via QR, a customer record is created and linked.
 
 | Column | Type | Constraints |
 |---|---|---|
@@ -176,6 +232,28 @@ Customer records. Deduplicated by phone number within a tenant.
 
 **UNIQUE INDEX** on `(tenant_id, phone)` to prevent duplicates.
 
+### notifications
+
+WhatsApp message tracking log.
+
+| Column | Type | Constraints |
+|---|---|---|
+| id | uuid | PK, DEFAULT gen_random_uuid() |
+| ticket_id | uuid | FK → tickets.id, NOT NULL |
+| type | enum | `ticket_created`, `assessment_complete`, `approval_confirmed`, `repair_complete`, `payment_receipt`, `ready_for_pickup`, `reminder` |
+| recipient_phone | varchar(20) | NOT NULL |
+| message_body | text | NOT NULL |
+| status | enum | `pending`, `sent`, `delivered`, `read`, `failed` |
+| external_message_id | varchar(255) | WhatsApp message ID (from API response) |
+| error_message | text | If failed |
+| sent_at | timestamptz | |
+| delivered_at | timestamptz | |
+| read_at | timestamptz | |
+| created_at | timestamptz | DEFAULT now() |
+| updated_at | timestamptz | DEFAULT now() |
+
+**UNIQUE INDEX** on `(tenant_id, phone)` to prevent duplicates.
+
 ### tickets
 
 The core table. Every repair job is a ticket.
@@ -186,30 +264,38 @@ The core table. Every repair job is a ticket.
 | tenant_id | uuid | FK → tenants.id, NOT NULL |
 | outlet_id | uuid | FK → outlets.id, NOT NULL |
 | ticket_number | varchar(20) | UNIQUE, NOT NULL (format: `D1-042` or `042`) |
-| customer_id | uuid | FK → customers.id, NOT NULL |
+| customer_id | uuid | FK → customers.id (nullable — anonymous Quick Repair has no customer) |
+| customer_name | varchar(255) | (for anonymous tickets without customer record) |
+| customer_phone | varchar(20) | (for anonymous tickets; nullable) |
 | device_id | uuid | FK → devices.id, NOT NULL |
-| status | enum | `received`, `assessing`, `assessed`, `approved`, `in_progress`, `completed`, `cancelled`, `picked_up` |
-| received_by | uuid | FK → users.id (front desk staff who created the ticket) |
+| intake_type | enum | `full_ai`, `quick_repair`, `voice_intake`, DEFAULT `full_ai` |
+| status | enum | `received`, `assessing`, `assessed`, `approved`, `in_progress`, `completed`, `paid`, `picked_up`, `cancelled` |
+| received_by | uuid | FK → users.id (staff who created the ticket) |
 | received_at | timestamptz | DEFAULT now() |
 | intake_notes | text | Customer's reported problem |
-| intake_photo_url | text | Photo of device (from Supabase Storage) |
+| intake_photo_url | text | Photo of device (from Supabase Storage; null for Quick Repair) |
 | intake_voice_url | text | Voice memo URL |
 | intake_voice_transcript | text | Transcribed voice memo (Whisper) |
 | intake_voice_structured | jsonb | Structured data extracted from voice (see below) |
-| damage_detected | jsonb | AI pre-existing damage report (see below) |
-| photo_quality_check | jsonb | Photo quality gate results (see below) |
+| damage_detected | jsonb | AI pre-existing damage report (null for Quick Repair) |
+| photo_quality_check | jsonb | Photo quality gate results (null for Quick Repair) |
 | assessment | jsonb | See assessment schema below |
 | technician_id | uuid | FK → users.id (technician assigned) |
 | assessed_at | timestamptz | |
 | estimated_cost | decimal(10,2) | Parts cost (calculated) |
 | estimated_price | decimal(10,2) | Total retail price (auto-calculated) |
-| customer_approval | enum | `pending`, `approved`, `declined` |
+| final_price | decimal(10,2) | Actual price paid (may differ from estimate; for Quick Repair, this is the set price) |
+| customer_approval | enum | `pending`, `approved`, `declined`, `auto_approved` (auto_approved for Quick Repair / Voice) |
 | approved_at | timestamptz | |
 | repair_notes | text | |
 | repair_photos | text[] | Array of photo URLs |
 | ai_whatsapp_drafts | jsonb[] | AI-generated WhatsApp message drafts |
 | started_at | timestamptz | When repair began |
 | completed_at | timestamptz | When repair finished |
+| paid_at | timestamptz | When payment was recorded |
+| payment_method | enum | `cash`, `qr_pay`, `bank_transfer` |
+| qr_token | varchar(64) | UNIQUE, short token for public ticket web view (`/t/{token}`) |
+| receipt_sent_via | enum | `whatsapp`, `qr_code`, `none` |
 | picked_up_at | timestamptz | When customer collected device |
 | created_at | timestamptz | DEFAULT now() |
 | updated_at | timestamptz | DEFAULT now() |
@@ -360,6 +446,12 @@ CREATE INDEX idx_tickets_technician ON tickets(technician_id, status);
 -- Tickets: by customer
 CREATE INDEX idx_tickets_customer ON tickets(customer_id);
 
+-- Tickets: by intake_type
+CREATE INDEX idx_tickets_intake_type ON tickets(intake_type);
+
+-- Tickets: by qr_token for public web view
+CREATE UNIQUE INDEX idx_tickets_qr_token ON tickets(qr_token);
+
 -- Customers: phone dedup
 CREATE UNIQUE INDEX idx_customers_tenant_phone ON customers(tenant_id, phone);
 
@@ -371,6 +463,12 @@ CREATE INDEX idx_ticket_history_ticket ON ticket_history(ticket_id);
 
 -- Notifications: by ticket
 CREATE INDEX idx_notifications_ticket ON notifications(ticket_id);
+
+-- Payments: by ticket (one-to-one)
+CREATE UNIQUE INDEX idx_payments_ticket ON payments(ticket_id);
+
+-- Device quick issues: by device
+CREATE INDEX idx_device_quick_issues_device ON device_quick_issues(device_id, display_order);
 ```
 
 ## State Machine
@@ -378,16 +476,22 @@ CREATE INDEX idx_notifications_ticket ON notifications(ticket_id);
 Ticket lifecycle with allowed transitions:
 
 ```
-RECEIVED ────▶ ASSESSING ────▶ ASSESSED ────▶ APPROVED ────▶ IN_PROGRESS ────▶ COMPLETED ────▶ PICKED_UP
-    │               │               │             │                │                  │
-    │               │               │             │                │                  │
-    └───────────────┴───────────────┴─────▶ CANCELLED ◀──────────────────────────────────┘
-    (from RECEIVED, ASSESSING, or ASSESSED)     (from any state)
+QUICK REPAIR / VOICE:
+  IN_PROGRESS ──▶ COMPLETED ──▶ PAID ──▶ PICKED_UP
+
+FULL AI:
+  RECEIVED ──▶ ASSESSING ──▶ ASSESSED ──▶ APPROVED ──▶ IN_PROGRESS ──▶ COMPLETED ──▶ PAID ──▶ PICKED_UP
+      │            │            │              │                │              │
+      │            │            │              │                │              │
+      └────────────┴────────────┴──────▶ CANCELLED ◀─────────────────────────────┘
+      (from RECEIVED, ASSESSING, or ASSESSED)     (from any state before PAID)
 ```
 
 **Business Rules:**
-- Only RECEIVED → ASSESSING is allowed (must be assessed first)
+- **Quick Repair / Voice Intake**: Automatically jumps to `in_progress` (skips assessment, auto-approved). `customer_approval` = `auto_approved`. `assessed_at` = `received_at`.
+- Only RECEIVED → ASSESSING is allowed for Full AI (must be assessed first)
 - Only ASSESSED → APPROVED (cannot approve without assessment)
-- Only APPROVED → IN_PROGRESS (customer must approve first)
-- CANCELLED from any state before IN_PROGRESS (no refund after work starts)
-- PICKED_UP only from COMPLETED
+- Only APPROVED → IN_PROGRESS (customer must approve first for Full AI)
+- **PAID** status added between COMPLETED and PICKED_UP — payment required before handoff
+- CANCELLED from any state before PAID (no cancellation after payment)
+- PICKED_UP only from PAID

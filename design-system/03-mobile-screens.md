@@ -516,6 +516,208 @@ Technician diagnoses the device, selects parts, calculates quote.
 
 ---
 
+## Screen K: Quick Repair (Baiki Cepat)
+
+### Purpose
+
+Technician-at-counter creates a ticket for a known fix with known price. No AI vision, no diagnosis flow — just typeahead + quick-select + price confirmation. Ticket auto-approved.
+
+### Layout
+
+- Header: "Baiki Cepat" with back arrow. 🎤 mic button (right) for voice mode.
+- ScrollView, minimal sections.
+
+### Sections
+
+#### 1. Device (Typeahead)
+- Text input with search icon
+- Placeholder: "Cari peranti..."
+- Typeahead results appear inline below input (not a modal)
+- Results show: device icon, model name, variant
+- Auto-select on exact match (e.g., "iPh" → iPhone 14 Pro highlighted)
+
+#### 2. Issue (Quick-Select)
+- Dropdown or scrollable chip list
+- Top-10 common issues for selected device (from `device_quick_issues`)
+- Each option shows:
+  - Issue name (e.g., "Penukaran Skrin OLED")
+  - Default price (e.g., "RM350")
+  - Labor time (e.g., "0.75 jam")
+  - Parts summary on expand (e.g., "1× Skrin OLED, 1× Gam")
+- Selected option highlighted with `--primary` border + left accent
+- Fallback: `[+ Taip masalah lain]` for unlisted issues
+
+#### 3. Price Card (Sticky)
+- Background: `--card`, border `--border`
+- Shows:
+  ```
+  Bahagian (1):    RM 339.00
+  Upah (0.75j):    RM  11.00
+                    ────────
+  JUMLAH:          RM 350.00  [Edit]
+  ```
+- Tapping [Edit] opens inline number input
+- Override confirmation if change > 20%
+
+#### 4. Customer (Optional)
+- Label: "Pelanggan (Pilihan)"
+- **Nama**: text input, placeholder: "Nama pelanggan"
+- **Telefon**: phone input, placeholder: "+6012-345-6789"
+- Typeahead on phone for existing customers
+- Helper text: "Jika kosong, resit dengan kod QR akan dijana"
+
+#### 5. Submit
+- `[HANTAR & CETAK RESIT]` — `accent` button, `lg`, full width
+- Subtext: "Pembaikan akan dimulakan serta-merta"
+
+### Success States
+
+| Phone Provided | No Phone |
+|---|---|
+| WhatsApp resit dihantar ke [nombor] | QR code displayed full-screen |
+| Status: Dalam Proses | "Imbas untuk kemaskini WhatsApp" |
+| [Buka Tiket] [Baiki Cepat Baru] | [Buka Tiket] [Baiki Cepat Baru] |
+
+---
+
+## Screen L: Voice Intake (Ambil Suara)
+
+### Purpose
+
+One-tap voice intake for any repair. Staff speaks, AI extracts, confirm in one tap.
+
+### Layout
+
+- Centered, minimal UI
+- Large microphone button (80px) in the center
+- Hero prompt text below
+
+### States
+
+#### idle
+- 🎤 icon, 80px, `--primary`
+- Text: "Ketuk untuk rakam"
+- Subtitle: "Sebut: peranti, masalah, pelanggan, harga"
+- Example: "iPhone 14 Pro skrin pecah, Ahmad, tiga ratus lima puluh"
+
+#### recording
+- 🔴 Red pulsing circle animation around mic
+- Timer: "00:04" (up to 30 seconds)
+- Waveform visualization (horizontal bars)
+- Label: "Sedang mendengar..."
+- Tap again to stop
+
+#### extracting
+- Spinner + "Mengenal pasti..."
+- Transcript appears character by character
+- ~1-2 seconds (Whisper + GPT-4o extraction)
+
+#### result
+- Confirmation card slides in from bottom:
+  ```
+  ✅ Peranti:    iPhone 14 Pro
+  ✅ Masalah:    Skrin pecah
+  ✅ Pelanggan:  Ahmad
+  ✅ Harga:      RM350
+  
+  Keyakinan: 91%
+  
+  Transkrip: "iPhone 14 Pro skrin pecah,
+  Ahmad, tiga ratus lima puluh"
+  ```
+- Each field has an edit icon (pencil) for correction
+- `[HANTAR TIKET]` — `primary` button, `lg`
+- `[Rakam Semula]` — `outline` button
+
+### Access Points
+- Home screen FAB → long-press → "Ambil Suara"
+- Quick Repair screen → 🎤 icon in header
+- New Ticket screen → 🎤 in customer notes section
+
+---
+
+## Screen M: Payment & Receipt
+
+### Purpose
+
+Record payment when a ticket is marked completed. Sends WhatsApp receipt or displays QR code receipt.
+
+### Trigger
+- Technician taps "Selesai" on a ticket → payment screen slides up
+- Or from ticket detail: `[Rekod Bayaran]` action button
+
+### Layout
+
+#### Header
+- Back/Cancel button
+- Title: "Pembayaran — Tiket #D1-043"
+- Ticket summary: device model, issue, outlet
+
+#### Price Recap Card
+- Background: `--card`, border `--border`
+- Parts breakdown (if from assessment)
+- Labor breakdown
+- Total displayed prominently in `heading-2`, `--primary` color
+
+#### Payment Form
+- **Amaun**: number input, auto-filled with estimate total, editable
+  - If edited lower: shows "Beza: -RM50.00" + reason dropdown (Diskaun / Harga Berbeza / Bayaran Sebahagian)
+- **Kaedah**: radio group (Tunai / QR Pay / Bank Transfer)
+  - Visual indicators: 💵 for Tunai, 📱 for QR Pay, 🏦 for Bank Transfer
+- **Nota**: optional text input
+
+#### Submit
+- `[SAHKAN BAYARAN & SELESAI]` — `primary` button, `lg`, full width
+- Subtext: "Stok akan dikemaskini secara automatik"
+- Shows parts being decremented: "Stok: Skrin OLED -1 (1 → 0)"
+
+### Success State
+
+| With Phone | Without Phone |
+|---|---|
+| ✅ Pembayaran Diterima | ✅ Pembayaran Diterima |
+| WhatsApp resit dihantar ke +60... | QR code displayed, 200px centered |
+| Resit WhatsApp preview card | "Tunjukkan QR ini kepada pelanggan" |
+| [Kembali ke Senarai] | [Kembali ke Senarai] |
+
+### Receipt WhatsApp Message Format
+```
+🔧 Repair Intake — Resit
+Tiket #D1-043
+iPhone 14 Pro — Penukaran Skrin OLED
+Jumlah: RM350.00 (Tunai)
+Cawangan: Dungun 1
+Tarikh: 03 Jun 2026, 3:30 PM
+
+Terima kasih! Sila simpan resit ini.
+```
+
+---
+
+## Screen N: QR Code Receipt Display
+
+### Purpose
+
+For anonymous Quick Repair / Voice tickets — a screen the technician shows to the customer containing a QR code that links to the public ticket web view.
+
+### Layout
+
+- Large QR code (200×200px), centered
+- Ticket number above
+- Device + issue summary
+- Status badge
+- Text: "Imbas untuk kemaskini WhatsApp & status"
+- Outlet name and address below
+- `[Buka Tiket]` and `[Tiket Baharu]` buttons
+
+### When Shown
+- After Quick Repair submit (no phone)
+- After Voice Intake submit (no phone)
+- After payment recording (no phone)
+- Accessible from ticket detail at any time via `[Kod QR]` button
+
+---
+
 ## iOS-Specific Patterns
 
 ### Haptics

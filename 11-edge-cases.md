@@ -144,6 +144,94 @@ OTHER: anything else
 
 ---
 
+## Quick Repair & Voice Intake Edge Cases
+
+### Case 1: Quick Repair — Wrong Device Selected
+**Trigger:** Technician typeaheads "iPh" and accidentally taps iPhone 14 instead of iPhone 14 Pro.
+
+**Flow:**
+1. Technician can immediately undo (soft delete within 30 seconds)
+2. Or edit device on the ticket detail screen
+3. If parts were auto-assigned for wrong device, they're cleared on device change
+4. Ticket history logs the correction
+
+### Case 2: Quick Repair — Inventory Below Minimum
+**Trigger:** Technician selects "Penukaran Skrin" for iPhone 14 Pro, but Skrin OLED stock = 1 at Dungun 1, and min_stock_alert = 3.
+
+**Flow:**
+1. Quick Repair screen shows warning: "Stok rendah: Skrin OLED (1 unit)"
+2. Technician can still proceed (they physically have the part)
+3. After completion, stock decrements to 0
+4. Low stock alert sent to manager notification
+5. Alternative: if stock is 0, show error "Bahagian tiada stok" and block submission
+
+### Case 3: Quick Repair — Price Override
+**Trigger:** Technician changes auto-filled RM350 to RM320 (discount or different part used).
+
+**Flow:**
+1. Price field is editable — technician taps and types new amount
+2. Difference logged in ticket_history: `{"override": "price", "from": 350.00, "to": 320.00}`
+3. If override exceeds ±20% of catalog price, confirmation dialog: "Harga berbeza 20% dari katalog. Pastikan?"
+4. Payment screen shows "Anggaran: RM350 | Dibayar: RM320" (difference visible)
+
+### Case 4: Voice Intake — AI Misrecognition
+**Trigger:** Voice says "iPhone empat belas pro" but AI extracts "iPhone 14 Pro Max".
+
+**Flow:**
+1. Confidence display shows: "Keyakinan: 72% — rendah"
+2. Each extracted field has a tappable edit icon:
+   - 📱 Peranti → tap to change device
+   - 🔧 Masalah → tap to change issue
+   - 👤 Pelanggan → tap to edit name
+   - 💰 Harga → tap to edit price
+3. Staff corrects the wrong field(s) and taps confirm
+4. Correction logged: `{"corrected_field": "device", "ai_value": "iPhone 14 Pro Max", "user_value": "iPhone 14 Pro"}`
+5. This feedback feeds into the AI Learning Loop (Month 4)
+
+### Case 5: Voice Intake — Incomplete Information
+**Trigger:** Voice says "iPhone skrin pecah" — missing customer name and price.
+
+**Flow:**
+1. AI extracts what it can: device + issue
+2. Missing fields highlighted in yellow: "Maklumat tidak lengkap"
+3. Staff fills in missing fields manually (customer name, phone, price)
+4. Ticket created as `voice_intake` with partial AI extraction
+
+### Case 6: Quick Repair — Customer Already in System
+**Trigger:** Technician enters phone number that matches an existing customer.
+
+**Flow:**
+1. Typeahead on phone field shows existing customer: "Ahmad bin Abdullah (5 lawatan)"
+2. Technician taps to auto-fill name
+3. Customer's `total_visits` incremented on ticket completion
+4. WhatsApp receipt sent to existing number automatically
+
+### Case 7: Payment — Amount Doesn't Match Estimate
+**Trigger:** Estimate was RM350, customer pays RM300.
+
+**Flow:**
+1. Payment screen shows original estimate and editable amount field
+2. Technician enters 300.00
+3. System shows: "Beza: -RM50.00"
+4. Requires technician to select reason from dropdown:
+   - Diskaun (Discount)
+   - Harga Berbeza (Different Price)
+   - Bayaran Sebahagian (Partial Payment)
+5. Incomplete payment keeps ticket status as `completed` (not `paid`) with balance RM50
+6. Customer can pay balance later — new payment record created, ticket → `paid` when balance = 0
+
+### Case 8: QR Receipt — Customer Subscribes Hours Later
+**Trigger:** Anonymous Quick Repair ticket #D1-043 created at 10am. Customer scans QR at 4pm and subscribes.
+
+**Flow:**
+1. Ticket already completed and paid by then
+2. Customer enters phone → `customers` record created (or matched)
+3. Ticket's `customer_id` and `customer_phone` updated
+4. Retroactive WhatsApp sent: "Resit untuk Tiket #D1-043 (dari pagi tadi): iPhone 14 Pro — Penukaran Skrin RM350. Terima kasih."
+5. All future tickets for this phone number linked to same customer
+
+---
+
 ## Technical Edge Cases
 
 ### Case 1: No Internet During Intake

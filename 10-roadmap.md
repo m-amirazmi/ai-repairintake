@@ -32,7 +32,7 @@
 - Ticket detail view (mobile)
 - Ticket creation from web dashboard
 
-### Week 4: AI Vision Integration + Damage Detection
+### Week 4: AI Vision Integration + Damage Detection + Quick Repair
 - OpenAI GPT-4o Vision integration: `POST /api/ai/identify-device`
 - **Pre-existing Damage Detection**: same Vision call detects scratches, cracks, dents, water damage indicators
 - Damage report overlay on intake photo with bounding boxes
@@ -41,18 +41,26 @@
 - "Not in catalog" handling + "quick add" flow
 - Test against 20+ real device photos
 - Polish intake UI: camera → quality gate → AI result + damage → confirm/edit → customer info
+- **Quick Repair screen**: Typeahead device selection, quick-select issue dropdown, auto-filled pricing, QR code receipt generation
+- **Voice Intake**: Microphone recording, `POST /api/ai/parse-voice-intake`, field extraction (device, issue, customer, price), confidence display
+- `POST /api/tickets/quick` and `POST /api/tickets/voice` endpoints
 - Malay translations for intake screens
 
-**Month 1 Deliverable:** Staff can create a ticket by taking a photo of the device. AI identifies the model. Customer info captured. Ticket saved to database. Basic list and detail views work.
+**Month 1 Deliverable:** Staff can create a ticket via any of three paths: photo+AI (Full AI), typeahead+quick-select (Quick Repair), or voice (Voice Intake). Device identification via Vision. Customer info captured. Basic list and detail views work.
 
 ---
 
 ## Month 2: Technician Assessment + Pricing Engine
 
-### Week 1: Ticket Lifecycle
-- Implement state machine transitions
+### Week 1: Ticket Lifecycle + Payment & Receipt
+- Implement state machine transitions (including `paid` status, auto-approve for Quick Repair/Voice)
 - `PATCH /api/tickets/:id/status` with validation
 - `PATCH /api/tickets/:id/assess` for assessment submission
+- `POST /api/tickets/:id/payment` and `PATCH /api/tickets/:id/complete-with-payment` endpoints
+- Payment recording UI: amount, method (cash/QR/bank), auto-decrement parts inventory
+- WhatsApp receipt generation + QR code receipt for anonymous tickets
+- `GET /api/tickets/:token/public` — public ticket web view
+- `PATCH /api/tickets/:token/subscribe` — customer subscribes via QR link
 - Ticket history logging (audit table)
 - Queue view for technicians (filter by outlet, status)
 - "Assess Now" prompt after ticket creation (for technician-role staff)

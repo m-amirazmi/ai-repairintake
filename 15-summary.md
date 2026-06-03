@@ -26,10 +26,13 @@ Repair shop intake is slow and error-prone:
 
 ## Core Innovation
 
+- **Graduated intake (3 tiers)**: Voice (<5s), Quick Repair (<10s), Full AI (30-90s). The system adapts to the job, not vice versa. Voice and Quick Repair are the defense against the "old POS is faster" problem.
 - **Two-stage intake**: Front desk receives (no diagnosis), technician assesses (with AI)
-- **Role-aware unified flow**: Any user can advance any ticket through any state. Technician at the counter? Flow compresses into a single session.
-- **AI-native from Day 1**: Not an add-on — AI powers device ID, damage detection, diagnosis, voice transcription, and messaging
+- **The system IS the POS**: Payment capture, receipt generation, and inventory decrement replace the old transactional POS for repairs
+- **Role-aware unified flow**: Any user can advance any ticket through any state. Technician at the counter? Quick Repair or Voice path compresses intake + assess + pay into a single flow
+- **AI-native from Day 1**: Not an add-on — AI powers device ID, damage detection, diagnosis, voice transcription, voice intake parsing, and messaging
 - **Damage documentation**: AI catalogs pre-existing condition, protecting shops from false damage claims
+- **QR receipt for anonymous repairs**: Cash-and-go customers don't need to share phone numbers. QR links to public ticket page where they can optionally subscribe
 - **Voice-first data entry**: Staff speak naturally, AI structures the data into ticket fields
 - **Malaysia-first**: Bahasa Melayu (primary), WhatsApp (100% communication), MYR, local repair patterns
 
@@ -60,9 +63,9 @@ TypeScript everywhere:
 ## Timeline
 
 | Month | Focus | Key Deliverable |
-|---|---|---|
-| **1** | Foundation + AI Vision | Staff creates tickets with AI device identification + damage detection + photo quality gate |
-| **2** | Assessment + Pricing + Voice | Technicians assess with AI suggestions, voice-to-structured notes, auto-quotes, AI WhatsApp drafting |
+|---|---|---|---|
+| **1** | Foundation + AI Vision + Quick Intake | Staff creates tickets via photo+AI, typeahead quick-select, or voice. AI identifies devices. Graduated intake operational. |
+| **2** | Assessment + Pricing + Payment | Technicians assess with AI suggestions, auto-quotes, payment capture + WhatsApp/QR receipts, inventory decrement, AI WhatsApp drafting |
 | **3** | Queue + Polish + Localization | Real-time queue, complete Malay localization, admin dashboard v1 |
 | **4** | Reports + Inventory + Learning | Reporting system, parts inventory, repair outcome learning loop |
 | **5** | Advanced AI + Offline | Smart quote flagging, demand forecasting, full offline mode |
@@ -94,29 +97,53 @@ TypeScript everywhere:
 | E-invoicing (LHDN MyInvois) | Complex regulatory integration | After SaaS launch |
 | Thermal printer integration | Digital tickets only for MVP | If shops demand it |
 | Refurbished phone sales/POS | Different module entirely | Phase 2 |
-| Android mobile app | All staff use iPhones | Phase 2 |
+| Android app (fully tested) | Already runs via Expo — iOS gets first-class polish | Post-launch |
 | Multi-brand beyond iPhone/Samsung | Covers 90% of repairs | Add on demand |
 
-## How It Works (The 30-Second Flow)
+## How It Works
 
+### Tier 1: Voice Intake (<5 seconds, fastest path)
+```
+1. TECHNICIAN TAPS 🎤 → speaks "iPhone 14 skrin pecah, Ahmad, RM350"
+2. AI EXTRACTS → device, issue, customer, price
+3. TAPS CONFIRM → ticket created, auto-approved, in progress
+```
+**Average time: 5 seconds.** For known fixes, no typing, no photo, no menu.
+
+### Tier 2: Quick Repair (<10 seconds, for common fixes)
+```
+1. TECHNICIAN TAPS "Baiki Cepat" → types "iPh" (3 chars)
+2. SELECTS ISSUE → "Penukaran Skrin" from top-10 list
+3. PRICE AUTO-FILLED → reviews (editable), taps submit
+4. TICKET CREATED → auto-approved, QR receipt generated
+```
+**Average time: 10 seconds.** Faster than any existing POS. Optional phone for WhatsApp receipt.
+
+### Tier 3: Full AI Intake (30-90 seconds, for unknown problems)
 ```
 1. STAFF OPENS PHONE → taps "New Ticket"
-2. SNAPS 1 PHOTO → AI identifies device
-3. TYPES CUSTOMER INFO → name + phone number
-4. TAPS SUBMIT → ticket created, WhatsApp sent to customer
+2. SNAPS 1 PHOTO → AI identifies device + detects pre-existing damage
+3. SPEAKS OR TYPES COMPLAINT → AI structures notes
+4. ENTERS CUSTOMER INFO → name + phone number
+5. TAPS SUBMIT → ticket created, WhatsApp sent
 ```
+**Average time: 30 seconds.** No manual device selection. No menu hunting.
 
-**Average time: 30 seconds.** No manual device selection. No menu hunting. No price guessing.
-
-Then:
+Then (Full AI only):
 ```
-5. TECHNICIAN OPENS TICKET → AI suggests diagnosis
-6. TAPS SUGGESTION → parts pre-filled, price auto-calculated
-7. REVIEWS + SAVES → WhatsApp quote sent to customer
-8. CUSTOMER REPLIES "YA" → ticket auto-approved
+6. TECHNICIAN OPENS TICKET → AI suggests diagnosis
+7. TAPS SUGGESTION → parts pre-filled, price auto-calculated
+8. REVIEWS + SAVES → WhatsApp quote sent to customer
+9. CUSTOMER REPLIES "YA" → ticket auto-approved
 ```
-
 **Average time: 1-2 minutes.** AI does the heavy lifting. Technician just validates.
+
+### Payment & Receipt (all tiers)
+```
+10. TECHNICIAN MARKS COMPLETED → payment screen slides up
+11. RECORDS PAYMENT (cash/QR/bank) → parts inventory decremented
+12. WHATSAPP RECEIPT SENT (or QR receipt if no phone)
+```
 
 ## Open Decisions (Before Building)
 

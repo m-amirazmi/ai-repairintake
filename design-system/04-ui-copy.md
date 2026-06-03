@@ -14,38 +14,42 @@
 
 | English | Malay (Formal) | Notes |
 |---------|---------------|-------|
-| Login | Log Masuk | |
-| Logout | Log Keluar | |
-| Register | Daftar | (Not used in MVP) |
-| Submit | Hantar | |
-| Save | Simpan | |
-| Save Draft | Simpan Draf | |
-| Cancel | Batal | |
-| Delete | Padam | |
-| Edit | Kemaskini | |
-| Update | Kemaskini | |
-| Confirm | Sahkan | |
-| Approve | Luluskan | |
-| Decline | Tolak | |
-| Back | Kembali | |
-| Next | Seterusnya | |
-| Done | Selesai | |
-| Close | Tutup | |
-| Open | Buka | |
-| Search | Cari | |
-| Filter | Tapis | |
-| Sort | Susun | |
-| Add | Tambah | |
-| Remove | Buang | |
-| Select | Pilih | |
-| View | Lihat | |
-| Send | Hantar | |
-| Resend | Hantar Semula | |
-| Retry | Cuba Lagi | |
-| Continue | Teruskan | |
-| Skip | Langkau | |
-| Yes | Ya | |
-| No | Tidak | |
+| Quick Repair | Baiki Cepat | Fast path for known fixes |
+| Voice Intake | Ambil Suara | Voice-based ticket creation |
+| Type to Search | Cari peranti... | Device typeahead placeholder |
+| Select Issue | Pilih Masalah | Quick-select dropdown label |
+| Payment | Pembayaran / Bayaran | |
+| Record Payment | Rekod Bayaran | |
+| Confirm Payment | Sahkan Bayaran | |
+| Receive Payment | Terima Bayaran | |
+| Receipt | Resit | |
+| Print Receipt | Cetak Resit | (digital, not thermal) |
+| QR Code | Kod QR | |
+| Scan QR | Imbas QR | |
+| Subscribe | Langgan | Customer subscribing to WhatsApp |
+| Amount | Amaun | |
+| Method | Kaedah | Payment method |
+| Difference | Beza | Price difference |
+| Discount | Diskaun | |
+| Partial Payment | Bayaran Sebahagian | |
+| Balance | Baki | Remaining balance |
+| Speak now | Sebut sekarang | Voice prompt |
+| Listening... | Sedang mendengar... | Voice recording state |
+| Say the problem | Sebut masalah peranti | Voice intake instruction |
+| Recognized | Dikenal pasti | After voice extraction |
+| Record again | Rakam semula | |
+| Customer (optional) | Pelanggan (Pilihan) | For Quick Repair |
+| If empty, QR receipt | Jika kosong, resit kod QR | Helper text |
+| Price | Harga | Quick Repair price card |
+| Edit if needed | Edit jika perlu | Price edit hint |
+| Repair starts immediately | Pembaikan akan dimulakan serta-merta | Quick Repair subtext |
+| Stock updated | Stok dikemaskini | After payment |
+| Balance: RM | Baki: RM | |
+| Cash | Tunai | |
+| QR Pay | QR Pay | (keep as is) |
+| Bank Transfer | Bank Transfer | (keep as is) |
+| Show QR to customer | Tunjukkan QR ini kepada pelanggan | No-phone receipt screen |
+| Scan for WhatsApp updates | Imbas untuk kemaskini WhatsApp | QR receipt caption |
 
 ---
 
@@ -263,6 +267,30 @@ Tarikh akhir ambil: [Tarikh]
 Sila ambil sebelum tarikh tersebut.
 ```
 
+### Payment Receipt (Quick Repair / Voice / Full AI)
+```
+🔧 Repair Intake — Resit
+
+Tiket #[Nombor]
+[Model] — [Diagnosis/Isu]
+Jumlah: RM[Jumlah] ([Kaedah])
+Cawangan: [Cawangan]
+Tarikh: [Tarikh], [Masa]
+
+Terima kasih! Sila simpan resit ini.
+```
+
+### Retroactive Receipt (QR Subscribe)
+```
+📋 Resit Tiket #[Nombor] (dari [Tarikh])
+
+[Model] — [Diagnosis/Isu]
+Jumlah: RM[Jumlah]
+
+Terima kasih! Langganan WhatsApp anda aktif.
+Kami akan hantar kemaskini untuk lawatan seterusnya.
+```
+
 ---
 
 ## Form Labels & Placeholders
@@ -288,13 +316,22 @@ Sila ambil sebelum tarikh tersebut.
 | Invalid email or password | Emel atau kata laluan tidak sah |
 | Please fill in all required fields | Sila isi semua medan yang diperlukan |
 | Please select a device | Sila pilih peranti |
+| Please select an issue | Sila pilih masalah |
 | Please enter customer name | Sila masukkan nama pelanggan |
 | Please enter phone number | Sila masukkan nombor telefon |
 | Failed to identify device | Gagal mengenal pasti peranti. Sila pilih secara manual. |
+| Voice not clear. Try again. | Suara kurang jelas. Sila cuba lagi. |
+| Could not understand. Type instead. | Tidak dapat difahami. Sila taip secara manual. |
+| Part out of stock | Bahagian tiada stok |
+| Low stock warning | Amaran stok rendah |
+| Price override too high/low | Harga berbeza dengan ketara dari katalog |
 | No internet connection | Tiada sambungan internet. Data disimpan secara tempatan. |
 | Failed to send WhatsApp | Gagal menghantar WhatsApp. Sila cuba lagi. |
+| Failed to generate QR code | Gagal menjana kod QR. Sila cuba lagi. |
 | Session expired | Sesi telah tamat. Sila log masuk semula. |
 | Something went wrong | Ada masalah teknikal. Sila cuba lagi. |
+| Payment amount too high | Amaun bayaran melebihi anggaran |
+| Payment record failed | Gagal merekod bayaran |
 
 ---
 
@@ -319,11 +356,18 @@ For screen readers and voiceover:
 | Element | Label (BM) |
 |---------|-----------|
 | Camera button | Butang kamera, ketuk untuk ambil gambar |
+| Voice intake button | Butang suara, ketuk untuk rakam masalah |
+| Recording indicator | Sedang merakam, ketuk untuk berhenti |
+| Quick Repair button | Butang Baiki Cepat |
+| QR code | Kod QR, imbas untuk kemaskini WhatsApp |
+| Payment button | Butang rekod bayaran |
+| Payment method selector | Pilih kaedah bayaran |
+| Price edit button | Butang edit harga |
 | Back button | Butang kembali |
 | Close button | Butang tutup |
 | Menu button | Butang menu |
 | Notification bell | Pemberitahuan, [N] belum dibaca |
-| FAB | Tiket baharu |
+| FAB | Tiket baharu, tekan lama untuk Baiki Cepat atau Ambil Suara |
 | Status badge | Status tiket: [Status] |
 | Search input | Carian |
 | Toggle on | Dihidupkan |

@@ -8,7 +8,9 @@ These diagrams can be rendered in any Mermaid-compatible viewer (GitHub, VS Code
 
 ```mermaid
 stateDiagram-v2
-    [*] --> RECEIVED: Front desk creates ticket
+    [*] --> RECEIVED: Full AI — front desk creates ticket
+    [*] --> IN_PROGRESS: Quick Repair / Voice — auto-approved
+
     RECEIVED --> ASSESSING: Technician starts assessment
     ASSESSING --> ASSESSED: Technician saves diagnosis
     ASSESSED --> APPROVED: Customer replies YES (WhatsApp)
@@ -17,7 +19,8 @@ stateDiagram-v2
     ASSESSING --> CANCELLED: Device beyond repair
     APPROVED --> IN_PROGRESS: Technician starts repair
     IN_PROGRESS --> COMPLETED: Repair done
-    COMPLETED --> PICKED_UP: Customer collects device
+    COMPLETED --> PAID: Payment recorded (cash/QR/bank)
+    PAID --> PICKED_UP: Customer collects device
     COMPLETED --> [*]: Auto-close after 7 days
     CANCELLED --> [*]: Device returned
     PICKED_UP --> [*]: Ticket archived
@@ -272,4 +275,58 @@ flowchart TD
     O -->|Yes| N
     P -->|No| C2
     P -->|Yes| N
+```
+
+---
+
+## 10. Graduated Intake Flow (Decision Tree)
+
+```mermaid
+graph TD
+    A[Staff opens app] --> B{What type of repair?}
+    
+    B -->|Known fix, known price| C{Phone number provided?}
+    C -->|Yes| D[Quick Repair / Voice → auto-approved → IN_PROGRESS]
+    C -->|No| E[Quick Repair / Voice → auto-approved → QR receipt → IN_PROGRESS]
+    
+    B -->|Unknown problem| F[Full AI intake → RECEIVED]
+    F --> G[Technician assesses → ASSESSED]
+    G --> H[WhatsApp YES/NO → APPROVED → IN_PROGRESS]
+    
+    D --> I[Repair → COMPLETED]
+    E --> I
+    H --> I
+    
+    I --> J{Phone number exists?}
+    J -->|Yes| K[Record payment → WhatsApp receipt → PAID]
+    J -->|No| L[Record payment → QR receipt → PAID]
+    
+    K --> M[Customer picks up → PICKED_UP]
+    L --> M
+```
+
+---
+
+## 11. Payment Flow
+
+```mermaid
+graph TD
+    A[Ticket COMPLETED] --> B[Payment screen slides up]
+    B --> C[Amount auto-filled from estimate]
+    C --> D{Staff edits amount?}
+    D -->|Yes| E[Enter new amount]
+    E --> F{Difference > 20%?}
+    F -->|Yes| G[Confirmation dialog required]
+    F -->|No| H[Continue]
+    D -->|No| H
+    G --> H
+    H --> I[Select method: Cash / QR / Bank]
+    I --> J[Tap Confirm Payment]
+    J --> K[Create payment record]
+    K --> L[Decrement parts inventory]
+    L --> M{Customer has phone?}
+    M -->|Yes| N[Send WhatsApp receipt]
+    M -->|No| O[Show QR code receipt]
+    N --> P[Ticket → PAID]
+    O --> P
 ```

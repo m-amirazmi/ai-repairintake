@@ -7,14 +7,20 @@ then extracting into SaaS.
 
 ## Key Decisions Made
 - **Scope**: Smartphones only (iPhone + Samsung Galaxy), 50 seed models
-- **Platform**: iOS only (Expo React Native), all staff use iPhones
+- **Platform**: iOS-first (Expo React Native). Staff currently use iPhones, but app runs on Android via Expo — iOS gets priority testing and polish.
 - **Tech Stack**: Expo (mobile) + Next.js (web/API) + Supabase (DB/auth/storage) + OpenAI GPT-4o (AI)
 - **Architecture**: Two-stage intake (front desk receives, technician assesses), SaaS-ready from Day 1
+- **Graduated Intake**: 3 tiers — Voice (<5s), Quick Repair (<10s), Full AI (30-90s). System adapts to job complexity.
+- **POS Replacement**: Payment capture, receipt generation, parts inventory decrement — the system IS the POS for repairs
+- **QR Receipt**: Anonymous repairs (no phone) get a QR code receipt linking to a public ticket web view where customer can subscribe to WhatsApp
+- **Quick Repair**: Typeahead device + quick-select issue + auto-filled price. Ticket auto-approved. No photo, no AI vision.
+- **Voice Intake**: Speak into phone → AI extracts device, issue, customer, price → confirm in one tap
+- **Payment**: Recorded at completion (not intake). Cash / QR Pay / Bank Transfer. Parts decremented on payment.
 - **Language**: Bahasa Melayu primary, English fallback
-- **WhatsApp**: Centralized HQ number via 360dialog, YES/NO reply approval flow
-- **Pricing**: Static catalog managed by business owner (supplier-agnostic)
+- **WhatsApp**: Centralized HQ number via 360dialog, YES/NO reply approval flow (Full AI only; Quick Repair auto-approves)
+- **Pricing**: Static catalog managed by business owner (supplier-agnostic). Price override with audit trail.
 - **Excluded**: E-invoicing, thermal printers, refurbished sales (deferred)
-- **AI**: Day 1 — GPT-4o Vision for device ID, GPT-4o for diagnosis suggestions
+- **AI**: Day 1 — GPT-4o Vision for device ID, GPT-4o for diagnosis + voice intake parse, Whisper for voice transcription
 - **Timeline**: 6 months solo build, Month 1-3 = MVP, Month 4-6 = SaaS extraction
 - **Dark mode**: Day 1, toggle in Profile screen, context-based switching
 - **Malay tone**: Formal ("Anda"), not casual
@@ -34,14 +40,20 @@ then extracting into SaaS.
 ## Next Session Starting Point
 1. Scaffold monorepo: `apps/mobile`, `apps/web`, `packages/shared` (Turborepo + pnpm)
 2. Initialize Expo mobile app with Expo Router
-3. Initialize Next.js web app with App Router
+3. Initialize Next.js web app with App Router (including public ticket view `/t/[token]`)
 4. Set up Supabase project + Drizzle ORM
-5. Write initial database migration
-6. Seed device catalog (50 iPhone/Samsung models)
-7. Build login screen (mobile + web) with Supabase Auth
-8. Build camera capture component for mobile
-9. Write `POST /api/ai/identify-device` endpoint
-10. Reference documentation: `/Users/amir/dev/ai/` (all docs including design system)
+5. Write initial database migration (including payments + device_quick_issues tables)
+6. Seed device catalog (50 iPhone/Samsung models) + seed top-10 quick issues per device
+7. Seed issue types (9 common issues) with Malay names
+8. Build login screen (mobile + web) with Supabase Auth
+9. Build camera capture component for mobile
+10. Build Quick Repair screen (typeahead device + quick-select issue + price card)
+11. Build Voice Intake screen (mic button + extraction confirmation card)
+12. Build Payment/Receipt screen (amount, method, QR receipt)
+13. Write `POST /api/ai/identify-device` endpoint
+14. Write `POST /api/ai/parse-voice-intake` endpoint
+15. Write `POST /api/tickets/quick` and `POST /api/tickets/voice` endpoints
+16. Reference documentation: `/Users/amir/dev/ai/` (all docs including design system)
 
 ## Key Files
 All documentation in `/Users/amir/dev/ai/`
