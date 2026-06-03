@@ -1,0 +1,474 @@
+# Mobile App — Flows & Screens
+
+## App Entry & Auth
+
+```
+┌─────────────────────────────────────────┐
+│  🔧 Repair Intake                       │
+│                                         │
+│  Log masuk ke akaun anda                │
+│  (Login to your account)                │
+│                                         │
+│  Emel:  [________________]              │
+│  Kata laluan: [________**]              │
+│                                         │
+│       [  Log Masuk  ]                   │
+│                                         │
+│  ─────────── atau ───────────           │
+│                                         │
+│  Lupa kata laluan?                      │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+Role-based home redirect:
+
+- `front_desk` → Tab: Jobs (focus on New Intake button)
+- `technician` → Tab: Jobs (focus on Queue)
+- `owner` / `manager` → Tab: Jobs (with admin access)
+
+---
+
+## Flow A: Front Desk Receives Device
+
+```
+┌─────────────────────────────────────────┐
+│  ☰  Tiket Baharu                  🔔 2  │
+│                                         │
+│  ═════════════════════════════════════  │
+│  ┌─────────────────────────────────┐    │
+│  │                                 │    │
+│  │      📷  KETUK UNTUK            │    │
+│  │         AMBIL GAMBAR            │    │
+│  │                                 │    │
+│  │   (Bahagian belakang peranti)   │    │
+│  │                                 │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ── Peranti dikenal pasti ──            │
+│  📱 iPhone 14 Pro                       │
+│    Ungu Tua (Deep Purple)               │
+│    Keyakinan: 94% ✅                    │
+│                                         │
+│  [Betul]  [Tidak, pilih manual]         │
+│                                         │
+│  ── Nota pelanggan ──                   │
+│  ┌─────────────────────────────────┐    │
+│  │ 🎤 [Tekan untuk rakam]          │    │
+│  │ ┌─────────────────────────────┐ │    │
+│  │ │ Skrin pecah, sentuh tak     │ │    │
+│  │ │ berfungsi...                │ │    │
+│  │ └─────────────────────────────┘ │    │
+│  │                                 │    │
+│  │  Kerosakan dikenal pasti:       │    │
+│  │  • Skrin — Pecah (sederhana)    │    │
+│  │  • Sentuh — Tidak berfungsi     │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ── Maklumat Pelanggan ──               │
+│  Nama:  [Ahmad bin Abdullah     ]       │
+│  Telefon: [+6012-345-6789       ]       │
+│  Emel:   [opsional              ]       │
+│                                         │
+│         [HANTAR KE TEKNIKAL]            │
+│                                         │
+│  (Tiada harga diberikan lagi)           │
+│                                         │
+└─────────────────────────────────────────┘
+
+After submit:
+┌─────────────────────────────────────────┐
+│  ✅ Tiket #D1-042 Dicipta               │
+│                                         │
+│  Peranti: iPhone 14 Pro                 │
+│  Pelanggan: Ahmad bin Abdullah          │
+│  Cawangan: Dungun 1                     │
+│                                         │
+│  WhatsApp akan dihantar kepada          │
+│  pelanggan: +6012-345-6789              │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │ 📋 Draf AI:                     │    │
+│  │ Salam Ahmad, tiket D1-042       │    │
+│  │ dicipta. iPhone 14 Pro...       │    │
+│  │ [Edit] [Hantar]                 │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│       [Buka Tiket]  [Tiket Baharu]      │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Flow A.5: Photo Quality Gate + Damage Detection
+
+After photo capture, before AI device ID:
+
+```
+┌─────────────────────────────────────────┐
+│  Tiket Baharu                           │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  📷 (preview with overlay)      │    │
+│  │                                 │    │
+│  │  [🟡 Kualiti sederhana]         │    │
+│  │  "Cahaya kurang — masih OK"     │    │
+│  │                                 │    │
+│  │  [✅ Peranti dalam bingkai]     │    │
+│  │                                 │    │
+│  │  [Ambil Semula]   [Teruskan →]  │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+  → Tekan "Teruskan" → AI Vision runs
+│                                         │
+│  ── Keadaan Peranti (Sebelum) ──        │
+│  🛡️ AI mengesan kerosakan sedia ada:    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │ 🟡 Goresan halus                │    │
+│  │    Lokasi: Panel belakang       │    │
+│  │    [Gambar thumbnail]  [✕]      │    │
+│  │                                 │    │
+│  │ 🔴 Retakan                      │    │
+│  │    Lokasi: Skrin                │    │
+│  │    Tahap: Sederhana             │    │
+│  │    [Gambar thumbnail]  [✕]      │    │
+│  │                                 │    │
+│  │ ✅ Tiada kerosakan air          │    │
+│  │                                 │    │
+│  │ [+ Tambah Kerosakan Manual]     │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  [✓ Sahkan Keadaan]                     │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Flow B: Technician Queue & Assessment
+
+### Queue Screen
+
+```
+┌─────────────────────────────────────────┐
+│  ☰  Senarai Tugas                 🔔 5  │
+│  Dungun 1                    [Tapis ▼]  │
+│                                         │
+│  ┌── #D1-042 ── iPhone 14 Pro ─── 10m ┐ │
+│  │ Diterima | Ahmad bin Abdullah      │ │
+│  │ "Skrin pecah, sentuh rosak"        │ │
+│  │                               [▶]  │ │
+│  └────────────────────────────────────┘ │
+│                                         │
+│  ┌── #D1-041 ── Samsung A54 ── 1j ────┐ │
+│  │ Sedang Dinilai | Amir (Teknikal)   │ │
+│  │ "Bateri cepat habis"               │ │
+│  └────────────────────────────────────┘ │
+│                                         │
+│  ┌── #D1-040 ── iPhone 11 ── 2j ──────┐ │
+│  │ Selesai Dinilai | Menanti lulus    │ │
+│  │ "Penukaran skrin: RM199"           │ │
+│  └────────────────────────────────────┘ │
+│                                         │
+│  ┌── #D1-039 ── iPhone 15 Pro ── 5j ──┐ │
+│  │ Dalam Proses | Amir                │ │
+│  │ "Penukaran skrin"                  │ │
+│  └────────────────────────────────────┘ │
+│                                         │
+│  [ + Tiket Baharu ]                     │
+└─────────────────────────────────────────┘
+```
+
+### Assessment Screen (Tap #D1-042)
+
+```
+┌─────────────────────────────────────────┐
+│  ←  Tiket #D1-042 — Penilaian           │
+│                                         │
+│  ┌── Peranti ──┬── Pelanggan ─────────┐ │
+│  │ iPhone 14P  │ Ahmad                │ │
+│  │ Ungu Tua    │ +6012-345-6789       │ │
+│  │             │                      │ │
+│  │ [Lihat      │ [Hubungi di          │ │
+│  │  gambar]    │  WhatsApp]           │ │
+│  └─────────────┴──────────────────────┘ │
+│                                         │
+│  Nota pelanggan:                        │
+│  🎤 "Skrin pecah, sentuh tak berfungsi" │
+│  [Dengar semula]                        │
+│                                         │
+│  AI extraction:                         │
+│  • Kerosakan: Skrin pecah               │
+│  • Lokasi: Tidak dinyatakan             │
+│  • Tahap: Tidak dinyatakan              │
+│  • Simptom: Sentuh tidak berfungsi      │
+│                                         │
+│  ═══════════════════════════════        │
+│  ── CADANGAN DIAGNOSIS ──               │
+│  (AI berdasarkan iPhone 14 Pro + nota)  │
+│                                         │
+│  ┌───────────────────────────────────┐  │
+│  │ 💡 CADANGAN PALING MUNGKIN:       │  │
+│  │                                   │  │
+│  │ [✓] Penukaran Skrin OLED          │  │
+│  │     (95% keyakinan)               │  │
+│  │     0.75 jam | RM89 (part)        │  │
+│  │                                   │  │
+│  │ [ ] Kerosakan Digitizer Sahaja    │  │
+│  │     (4% keyakinan)                │  │
+│  │                                   │  │
+│  │ [ ] Kerosakan Motherboard         │  │
+│  │     (1% keyakinan)                │  │
+│  └───────────────────────────────────┘  │
+│                                         │
+│  Atau taip diagnosis sendiri:           │
+│  ┌─────────────────────────────────┐    │
+│  │ Cari atau taip diagnosis...     │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ═══════════════════════════════        │
+│  ── BAHAGIAN ──                         │
+│  ┌─────────────────────────────────┐    │
+│  │ Skrin OLED + Digitizer   x1     │    │
+│  │          Kos: RM89  Harga: RM179│    │
+│  └─────────────────────────────────┘    │
+│  ┌─────────────────────────────────┐    │
+│  │ Gam perekat              x1     │    │
+│  │          Kos: RM5   Harga: RM10 │    │
+│  └─────────────────────────────────┘    │
+│  [+ Tambah bahagian]                    │
+│                                         │
+│  ── UPAH ──                             │
+│  ┌─────────────────────────────────┐    │
+│  │ Masa:   [ 0.75 ] jam            │    │
+│  │ Kadar:  RM50.00 / jam           │    │
+│  │ Jumlah: RM37.50                 │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ── JUMLAH ──                           │
+│  ┌─────────────────────────────────┐    │
+│  │ Bahagian:       RM 94.00        │    │
+│  │ Upah:           RM 37.50        │    │
+│  │ Tambahan: [____] RM 0.00        │    │
+│  │                ──────────       │    │
+│  │ ANGGARAN:       RM 131.50       │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ── TEMPOH ──                           │
+│  ● 30-45 minit (tunggu)                 │
+│  ○ 1-3 hari                             │
+│  ○ 3-7 hari                             │
+│                                         │
+│  Nota teknikal:                         │
+│  ┌─────────────────────────────────┐    │
+│  │ Skrin pecah di penjuru kanan    │    │
+│  │ bawah. Tiada kerosakan LCD.     │    │
+│  │ Sentuh berfungsi 80%.           │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌────────────┐  ┌──────────────────┐   │
+│  │ SIMPAN     │  │ HANTAR & NOTIFY  │   │
+│  │ DRAF       │  │ (WhatsApp)       │   │
+│  └────────────┘  └──────────────────┘   │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Flow C: Device Dead / Unknown Diagnosis
+
+```
+┌─────────────────────────────────────────┐
+│  ←  Tiket #D1-045 — Penilaian           │
+│                                         │
+│  ⚠️ PERANTI TIDAK BOLEH DIHIDUPKAN      │
+│                                         │
+│  Diagnosis tidak boleh dibuat tanpa     │
+│  pemeriksaan fizikal.                   │
+│                                         │
+│  Nota pelanggan: "Bateri rosak"         │
+│  Nota kaunter: "Peranti mati, tak       │
+│  boleh hidupkan"                        │
+│                                         │
+│  ── PILIHAN ──                          │
+│  ┌─────────────────────────────────┐    │
+│  │ [1] YURAN PEMERIKSAAN: RM29     │    │
+│  │     Periksa peranti. Anggaran   │    │
+│  │     akan dihantar kemudian.     │    │
+│  │                                 │    │
+│  │ [2] TUNGGU KELULUSAN            │    │
+│  │     Maklumkan pelanggan dulu.   │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │ [SIMPAN SEBAGAI "SEDANG DINILAI"]│   │
+│  └─────────────────────────────────┘    │
+└─────────────────────────────────────────┘
+
+After physical inspection:
+┌─────────────────────────────────────────┐
+│  ←  Tiket #D1-045 — Penilaian Lanjut    │
+│                                         │
+│  ── DAPATAN TEKNIKAL ──                 │
+│  (Selepas pemeriksaan fizikal)          │
+│                                         │
+│  💡 CADANGAN AI (dikemaskini):          │
+│  Berdasarkan iPhone 12 + "mati":        │
+│  [ ] Kerosakan Bateri (30%)             │
+│  [ ] Port Pengecas (15%)                │
+│  [✓] Short Motherboard (45%)            │
+│  [ ] Butang Power (10%)                 │
+│                                         │
+│  Diagnosis sebenar:                     │
+│  ┌─────────────────────────────────┐    │
+│  │ ✓ Kerosakan Motherboard         │    │
+│  │   Capacitor terbakar (C321)     │    │
+│  │   berhampiran CPU power rail    │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ⚠️ PERUBAHAN HARGA BESAR               │
+│  ┌─────────────────────────────────┐    │
+│  │ Yuran semakan:       RM 29.00   │    │
+│  │ Anggaran baru:       RM 289.00  │    │
+│  │                                 │    │
+│  │ Pelanggan perlu luluskan        │    │
+│  │ semula.                         │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  [SIMPAN & HANTAR NOTIFIKASI]           │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Flow D: Technician Does Everything (No Handoff)
+
+After staff (who is a technician) submits a new ticket:
+
+```
+┌─────────────────────────────────────────┐
+│  ✅ Tiket #D1-042 Dicipta               │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  ASSESS SEKARANG?               │    │
+│  │                                 │    │
+│  │  Anda adalah teknikal.          │    │
+│  │  Nilaikan peranti ini sekarang? │    │
+│  │                                 │    │
+│  │  [YA, NILAIKAN]                 │    │
+│  │  [KEMUDIAN — tambah ke senarai] │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  → Tekan "YA" → Langsung ke             │
+│    Assessment Screen (Flow B)           │
+│                                         │
+│  → Tekan "KEMUDIAN" → Kembali ke        │
+│    Queue. Tiket dalam senarai.          │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Flow E: WhatsApp Conversation (Customer's Phone)
+
+```
+┌─────────────────────────────────────────┐
+│  WHATSAPP CHAT                          │
+│                                         │
+│  ── Repair Intake ── 10:32 AM           │
+│  👋 Salam Ahmad,                        │
+│                                         │
+│  Tiket #D1-042 telah dicipta.           │
+│  Peranti: iPhone 14 Pro                 │
+│  Cawangan: Dungun 1                     │
+│                                         │
+│  Kami akan nilaikan dan hubungi anda    │
+│  sebentar lagi.                         │
+│                                         │
+│  ── Repair Intake ── 11:52 AM           │
+│  🔧 Penilaian selesai!                  │
+│                                         │
+│  Peranti: iPhone 14 Pro                 │
+│  Masalah: Penukaran skrin               │
+│  Anggaran: RM132                        │
+│  Tempoh: 1-3 hari                       │
+│                                         │
+│  Balas **YA** untuk luluskan.           │
+│  Balas **TIDAK** untuk batal.           │
+│                                         │
+│  ── Anda ── 11:55 AM                    │
+│  YA                                     │
+│                                         │
+│  ── Repair Intake ── 11:55 AM           │
+│  ✅ Diterima! Pembaikan sedang          │
+│  dijalankan. Kami akan hubungi anda     │
+│  apabila siap.                          │
+│                                         │
+│  ── Repair Intake ── 1:47 PM            │
+│  🎉 Peranti anda sudah siap!            │
+│                                         │
+│  iPhone 14 Pro — Penukaran skrin selesai│
+│                                         │
+│  Sila ambil di:                         │
+│  Dungun 1, No. 23, Jalan Besar          │
+│  Waktu operasi: 9 pagi - 7 malam        │
+│                                         │
+│  [Tunjuk tiket →]                       │
+│                                         │
+│  ── 3 hari kemudian ──                  │
+│  ── Repair Intake ── 10:00 AM           │
+│  ⏰ Peringatan: Peranti iPhone 14 Pro   │
+│  anda masih belum diambil.              │
+│  Tarikh akhir ambil: 28 Mei 2026        │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## Navigation Structure
+
+```
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│   ┌────┐  ┌────────┐  ┌────────┐  ┌──────┐      │
+│   │ 📋 │  │  🔧    │  │  📊    │  │ ⚙️   │      │
+│   │Jobs│  │Assess  │  │History │  │Profile│     │
+│   └────┘  └────────┘  └────────┘  └──────┘      │
+│                                                 │
+│  Tab 1: JOBS (home)                             │
+│  ├── Quick Intake button (prominent at top)     │
+│  ├── Today's queue (live list)                  │
+│  └── My assigned tickets (technician)           │
+│                                                 │
+│  Tab 2: ASSESS (technicians only)               │
+│  └── Tickets waiting for assessment             │
+│                                                 │
+│  Tab 3: HISTORY                                 │
+│  ├── Completed tickets                          │
+│  ├── Search by ticket #, customer, device       │
+│  └── Date filter                                │
+│                                                 │
+│  Tab 4: PROFILE                                 │
+│  ├── Name, role, outlet                         │
+│  ├── Switch outlet (managers only)              │
+│  ├── Language toggle (BM / EN)                  │
+│  └── Logout                                     │
+└─────────────────────────────────────────────────┘
+```
+
+## Key Design Patterns
+
+1. **Camera-first**: The camera capture area is the most prominent element on the new ticket screen. No hunting through menus.
+
+2. **Suggestion chips**: AI suggestions are tappable pills, not dropdown menus. Faster than typing or scrolling.
+
+3. **Confidence display**: Every AI result shows a confidence percentage. Staff know when to trust or override.
+
+4. **Autosave**: Assessment drafts autosave every 30 seconds. No lost work if the app backgrounds.
+
+5. **Pull-to-refresh → Real-time**: Initially pull-to-refresh the queue. Upgrade to Supabase Realtime subscriptions (Month 3) for live updates without user action.
+
+6. **Offline queue**: If no internet, tickets queue locally in AsyncStorage and sync when connection returns.
