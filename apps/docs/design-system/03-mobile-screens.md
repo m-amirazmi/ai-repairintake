@@ -1,3 +1,8 @@
+> **📁 Active Development Moved:** Mobile screen UI specs have been broken down into per-feature files in `apps/docs/mobile/`.  
+> For focused, screen-level specifications (Auth, Queue, New Ticket, Assessment, Quick Repair, Voice Intake, Payment, Profile, History, etc.), see the files in that folder. This document is kept for historical reference.
+
+---
+
 # Mobile Screens & Flows
 
 ## Navigation Structure
@@ -6,10 +11,11 @@
 
 | Tab | Icon                     | Label (BM) | Label (EN) | Visible To       |
 | --- | ------------------------ | ---------- | ---------- | ---------------- |
-| 1   | `ClipboardList` (Lucide) | Tugas      | Jobs       | All roles        |
-| 2   | `Stethoscope` (Lucide)   | Nilai      | Assess     | Technicians only |
-| 3   | `History` (Lucide)       | Sejarah    | History    | All roles        |
-| 4   | `UserCircle` (Lucide)    | Profil     | Profile    | All roles        |
+| 1   | `Home` (Lucide)          | Utama      | Home       | All roles        |
+| 2   | `ClipboardList` (Lucide) | Tugas      | Jobs       | All roles        |
+| 3   | `Stethoscope` (Lucide)   | Nilai      | Assess     | Technicians only |
+| 4   | `History` (Lucide)       | Sejarah    | History    | All roles        |
+| 5   | `UserCircle` (Lucide)    | Profil     | Profile    | All roles        |
 
 **Active state**: Filled icon, `--primary` color
 **Inactive state**: Outline icon, `--muted-foreground`
@@ -17,9 +23,11 @@
 
 ### Stack Screens (pushed over tabs)
 
-- `new-ticket` — New Ticket Flow (from FAB or "Tiket Baharu" button)
+- `new-ticket` — New Ticket Flow (from Home "Create Ticket" action card)
 - `ticket/[id]` — Ticket Detail
-- `assessment/[id]` — Assessment Screen
+- `assessment/[id]` — Assessment Screen (from Home "Assessment" action card or ticket detail)
+- `quick-repair` — Quick Repair (from Home "Quick Repair" action card)
+- `voice-intake` — Voice Intake (from Quick Repair header mic)
 - `forgot-password` — Password reset
 
 ---
@@ -122,13 +130,6 @@ Primary work surface. Shows today's repair tickets with quick filtering.
 - Title: "Tiada tugas hari ini"
 - Description: "Semua tiket telah diselesaikan. Rehat sebentar!"
 - Action: "[Tiket Baharu]" button
-
-### FAB
-
-- Position: Bottom-right, 24px from edges, 16px above tab bar
-- Icon: Plus
-- Color: `--accent`
-- Action: Push to New Ticket
 
 ### Pull-to-Refresh
 

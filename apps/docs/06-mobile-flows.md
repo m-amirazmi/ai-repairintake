@@ -1,3 +1,8 @@
+> **📁 Active Development Moved:** Mobile UI specs have been broken down into per-feature files in `apps/docs/mobile/`.  
+> For screen-level UI specs (layouts, states, components, copy), see the files in that folder. This document is kept for historical reference and full flow narratives including API calls.
+
+---
+
 # Mobile App — Flows & Screens
 
 ## App Entry & Auth
@@ -23,17 +28,17 @@
 
 Role-based home redirect:
 
-- `front_desk` → Tab: Jobs (focus on New Intake button)
-- `technician` → Tab: Jobs (focus on Queue)
-- `owner` / `manager` → Tab: Jobs (with admin access)
+- All roles → Tab: **Utama (Home)** — the intake landing hub with stats, recent tickets, and flow action cards.
 
 ---
 
-## Flow A: Front Desk Receives Device
+## Flow A: Front Desk Receives Device (from Home)
+
+Launched from Home "Create Ticket" action card.
 
 ```
 ┌─────────────────────────────────────────┐
-│  ☰  Tiket Baharu                  🔔 2  │
+│  Batal           Tiket Baharu        Simpan │
 │                                         │
 │  ═════════════════════════════════════  │
 │  ┌─────────────────────────────────┐    │
@@ -180,7 +185,7 @@ After photo capture, before AI device ID:
 └─────────────────────────────────────────┘
 ```
 
-### Assessment Screen (Tap #D1-042)
+### Assessment Screen (Tap ticket from Home or Queue)
 
 ```
 ┌─────────────────────────────────────────┐
@@ -277,7 +282,9 @@ After photo capture, before AI device ID:
 
 ---
 
-## Flow C: Device Dead / Unknown Diagnosis
+## Flow C: Device Dead / Unknown Diagnosis (from Assessment Edge-Case Trigger)
+
+Reached via the edge-case trigger card on the Assessment screen (`06-assessment.md` §Section 2.5).
 
 ```
 ┌─────────────────────────────────────────┐
@@ -428,11 +435,13 @@ After staff (who is a technician) submits a new ticket:
 
 ---
 
-## Flow F: Quick Repair (Technician at Counter)
+## Flow F: Quick Repair (Technician at Counter, from Home)
+
+Launched from Home "Quick Repair" action card.
 
 ```
 ┌─────────────────────────────────────────┐
-│  ←  Baiki Cepat                         │
+│  Batal           Baiki Cepat              │
 │                                         │
 │  ── Peranti ──                          │
 │  ┌─────────────────────────────────┐    │
@@ -520,11 +529,13 @@ After submit (no phone):
 
 ---
 
-## Flow G: Voice Intake
+## Flow G: Voice Intake (from Quick Repair)
+
+Launched from Quick Repair header mic button or New Ticket customer notes mic.
 
 ```
 ┌─────────────────────────────────────────┐
-│  ←  Ambil Suara                         │
+│  Batal           Ambil Suara            │
 │                                         │
 │  ┌─────────────────────────────────┐    │
 │  │                                 │    │
@@ -564,7 +575,6 @@ After submit (no phone):
 └─────────────────────────────────────────┘
 
 Accessible from:
-  - Home screen FAB (long press → "Baiki Cepat / Ambil Suara")
   - Quick Repair screen (🎤 button in header)
   - Full AI New Ticket screen (🎤 button in customer notes section)
 ```
@@ -700,38 +710,43 @@ After subscribing:
 ## Navigation Structure (Updated)
 
 ```
-┌─────────────────────────────────────────────────┐
-│                                                 │
-│   ┌────┐  ┌────────┐  ┌────────┐  ┌──────┐      │
-│   │ 📋 │  │  🔧    │  │  📊    │  │ ⚙️   │      │
-│   │Jobs│  │Assess  │  │History │  │Profile│     │
-│   └────┘  └────────┘  └────────┘  └──────┘      │
-│                                                 │
-│  Tab 1: JOBS (home)                             │
-│  ├── FAB: Tiket Baharu (Full AI)                │
-│  ├── FAB long-press: Baiki Cepat / Ambil Suara  │
-│  ├── Today's queue (live list)                  │
-│  └── My assigned tickets (technician)           │
-│                                                 │
-│  Tab 2: ASSESS (technicians only)               │
-│  └── Tickets waiting for assessment             │
-│                                                 │
-│  Tab 3: HISTORY                                 │
-│  ├── Completed tickets                          │
-│  ├── Search by ticket #, customer, device       │
-│  └── Date filter                                │
-│                                                 │
-│  Tab 4: PROFILE                                 │
-│  ├── Name, role, outlet                         │
-│  ├── Switch outlet (managers only)              │
-│  ├── Language toggle (BM / EN)                  │
-│  └── Logout                                     │
-└─────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                                                              │
+│   ┌────┐  ┌────┐  ┌────────┐  ┌────────┐  ┌──────┐          │
+│   │ 🏠 │  │ 📋 │  │  🔧    │  │  📊    │  │ ⚙️   │          │
+│   │Home│  │Jobs│  │Assess  │  │History │  │Profile│         │
+│   └────┘  └────┘  └────────┘  └────────┘  └──────┘          │
+│                                                              │
+│  Tab 1: UTAMA / HOME (default after login)                   │
+│  ├── Welcome + stats row                                     │
+│  ├── Flow action cards: Create Ticket | Assessment | Quick   │
+│  ├── Recent tickets preview                                  │
+│  └── Partner/branch selector                                 │
+│                                                              │
+│  Tab 2: TUGAS / JOBS                                         │
+│  ├── Today's queue (live list)                               │
+│  ├── Filter chips: Semua | Diterima | Sedang Dinilai | Selesai│
+│  └── My assigned tickets (technician)                        │
+│                                                              │
+│  Tab 3: NILAI / ASSESS (technicians only)                    │
+│  └── Tickets waiting for assessment                          │
+│                                                              │
+│  Tab 4: SEJARAH / HISTORY                                    │
+│  ├── Completed tickets                                       │
+│  ├── Search by ticket #, customer, device                    │
+│  └── Date filter                                             │
+│                                                              │
+│  Tab 5: PROFIL / PROFILE                                     │
+│  ├── Name, role, outlet                                      │
+│  ├── Switch outlet (managers only)                           │
+│  ├── Language toggle (BM / EN)                               │
+│  └── Logout                                                  │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ## Key Design Patterns (Updated)
 
-1. **Graduated entry points**: FAB single-tap opens Full AI intake. Long-press shows Quick Repair / Voice Intake. Role-aware: technicians see all three, front desk sees Full AI only.
+1. **Home-first navigation**: The Home / Utama tab is the post-login landing with three action cards (Create Ticket, Assessment, Quick Repair) as the canonical entry points for all intake flows. The Nilai (Assess) tab remains for technician convenience.
 
 2. **Camera-first**: The camera capture area is the most prominent element on the new ticket screen. No hunting through menus.
 

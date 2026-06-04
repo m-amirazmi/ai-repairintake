@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repair Intake — Mobile Wireframes by User Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --background: #f7f9f3;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #14b8a6;
+  --secondary-foreground: #ffffff;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #f59e0b;
+  --accent-foreground: #000000;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #d1d5db;
+  --ring: #a5b4fc;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Space Mono', 'SF Mono', monospace;
+  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-sans); background: var(--muted); color: var(--foreground); height: 100vh; overflow: hidden; }
+.container { display: flex; height: 100vh; max-width: 1400px; margin: 0 auto; padding: 24px; gap: 32px; }
+.sidebar { width: 282px; flex-shrink: 0; display: flex; flex-direction: column; gap: 3px; overflow-y: auto; }
+.sidebar h1 { font-size: 20px; font-weight: 700; margin-bottom: 2px; color: var(--foreground); }
+.sidebar .subtitle { font-size: 12px; color: var(--muted-foreground); margin-bottom: 10px; line-height: 1.5; }
+.flow-header { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted-foreground); padding: 14px 12px 3px; margin-top: 2px; border-top: 1px solid var(--border); }
+.flow-header:first-child { border-top: none; margin-top: 0; padding-top: 4px; }
+.flow-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 5px; vertical-align: middle; position: relative; top: -1px; }
+.flow-dot.a { background: var(--primary); }
+.flow-dot.b { background: var(--accent); }
+.flow-dot.c { background: var(--secondary); }
+.flow-dot.shared { background: var(--muted-foreground); }
+.flow-dot.ref { background: var(--border); }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-md); cursor: pointer; border: 1px solid transparent; background: var(--card); transition: all 0.15s; text-align: left; font-size: 13px; color: var(--foreground); }
+.nav-item:hover { background: var(--muted); border-color: var(--border); }
+.nav-item.active { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+.nav-item .num { width: 26px; height: 26px; border-radius: 50%; background: var(--muted); color: var(--muted-foreground); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.nav-item.active .num { background: rgba(255,255,255,0.2); color: var(--primary-foreground); }
+.nav-item .info { display: flex; flex-direction: column; min-width: 0; }
+.nav-item .title { font-weight: 600; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-item .desc { font-size: 10px; color: var(--muted-foreground); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-item.active .desc { color: rgba(255,255,255,0.55); }
+.stage { flex: 1; display: flex; align-items: center; justify-content: center; }
+.phone-frame { width: 375px; height: 812px; background: #111; border-radius: 48px; padding: 12px; box-shadow: 0 25px 80px rgba(0,0,0,0.25), 0 10px 30px rgba(0,0,0,0.15); position: relative; flex-shrink: 0; }
+.phone-frame::before { content: ''; position: absolute; top: 24px; left: 50%; transform: translateX(-50%); width: 120px; height: 28px; background: #111; border-radius: 20px; z-index: 10; }
+.phone-screen { width: 100%; height: 100%; background: var(--background); border-radius: 38px; overflow: hidden; position: relative; display: none; }
+.phone-screen.active { display: block; }
+.status-bar { height: 44px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 24px 8px; font-size: 12px; font-weight: 600; color: var(--foreground); position: relative; z-index: 5; }
+.status-bar .time { font-variant-numeric: tabular-nums; }
+.status-bar .icons { display: flex; gap: 4px; }
+.input-group { width: 100%; margin-bottom: 14px; }
+.input-group label { font-size: 11px; font-weight: 600; color: var(--muted-foreground); margin-bottom: 5px; display: block; }
+.input-box { width: 100%; height: 48px; border: 1px solid var(--input); border-radius: var(--radius-md); background: var(--card); display: flex; align-items: center; padding: 0 12px; font-size: 14px; color: var(--muted-foreground); }
+.input-box.with-icon { justify-content: space-between; }
+.textarea-box { width: 100%; min-height: 72px; border: 1px solid var(--input); border-radius: var(--radius-md); padding: 10px 12px; font-size: 14px; color: var(--muted-foreground); background: var(--card); }
+.btn { width: 100%; height: 48px; border-radius: var(--radius-md); border: none; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-top: 6px; transition: opacity 0.15s, transform 0.15s; }
+.btn:active { opacity: 0.9; transform: scale(0.98); }
+.btn-primary { background: var(--primary); color: var(--primary-foreground); }
+.btn-secondary { background: var(--secondary); color: var(--secondary-foreground); }
+.btn-outline { background: var(--card); border: 1px solid var(--border); color: var(--foreground); }
+.btn-ghost { background: transparent; color: var(--muted-foreground); font-weight: 500; }
+.btn-sm { height: 36px; padding: 0 12px; font-size: 12px; margin-top: 0; }
+.btn-lg { height: 56px; font-size: 16px; padding: 0 24px; }
+.btn-destructive { background: var(--destructive); color: var(--destructive-foreground); }
+.btn-accent { background: var(--accent); color: var(--accent-foreground); }
+.divider { width: 100%; display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--muted-foreground); font-size: 12px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.section-title { font-size: 15px; font-weight: 700; color: var(--foreground); margin-bottom: 10px; margin-top: 6px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
+.field-label { font-size: 10px; font-weight: 600; color: var(--muted-foreground); margin-bottom: 3px; display: block; }
+.field-row { margin-bottom: 8px; }
+.chip { padding: 6px 14px; border-radius: var(--radius-full); font-size: 12px; font-weight: 500; white-space: nowrap; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--foreground); transition: all 0.15s; }
+.chip.active { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+.chip:hover:not(.active) { background: var(--muted); }
+.status-badge { padding: 2px 8px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; display: inline-block; height: 22px; line-height: 18px; }
+.badge-received { background: #e0e7ff; color: #4f46e5; }
+.badge-assessing { background: #ccfbf1; color: #14b8a6; }
+.badge-assessed { background: #fef3c7; color: #d97706; }
+.badge-approved { background: #dcfce7; color: #22c55e; }
+.badge-inprogress { background: #dbeafe; color: #3b82f6; }
+.badge-completed { background: #f3e8ff; color: #a855f7; }
+.badge-cancelled { background: #fee2e2; color: #dc2626; }
+.badge-paid { background: #ccfbf1; color: #14b8a6; }
+.badge-picked_up { background: #f0fdf4; color: #15803d; }
+.tab-bar { height: 64px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; padding-bottom: 8px; position: absolute; bottom: 0; width: 100%; }
+.tab-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 500; color: var(--muted-foreground); cursor: pointer; }
+.tab-item.active { color: var(--primary); }
+.tab-item svg { width: 22px; height: 22px; }
+.toggle { width: 44px; height: 24px; background: var(--input); border-radius: 12px; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+.toggle.active { background: var(--primary); }
+.toggle::after { content: ''; position: absolute; width: 20px; height: 20px; background: var(--card); border-radius: 50%; top: 2px; left: 2px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.toggle.active::after { transform: translateX(20px); }
+.timeline { padding: 8px 0; }
+.timeline-item { display: flex; align-items: flex-start; gap: 10px; position: relative; padding-bottom: 16px; }
+.timeline-item::before { content: ''; position: absolute; left: 5px; top: 10px; bottom: -6px; width: 2px; background: var(--border); }
+.timeline-item:last-child::before { display: none; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; z-index: 1; }
+.dot-current { background: var(--primary); }
+.dot-past { background: var(--muted-foreground); }
+.dot-future { background: var(--card); border: 2px solid var(--border); }
+.timeline-label { font-size: 12px; font-weight: 600; color: var(--foreground); }
+.timeline-label.current { color: var(--primary); }
+.timeline-label.past { color: var(--muted-foreground); }
+.timeline-label.future { color: var(--input); }
+.timeline-time { font-size: 10px; color: var(--muted-foreground); margin-top: 1px; }
+.login-screen { display: flex; flex-direction: column; align-items: center; padding: 50px 24px 24px; height: 100%; justify-content: flex-start; background: var(--background); }
+.logo-box { width: 72px; height: 72px; background: var(--primary); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; }
+.logo-box svg { width: 36px; height: 36px; color: var(--primary-foreground); }
+.login-screen h2 { font-size: 24px; font-weight: 700; margin-bottom: 5px; color: var(--foreground); }
+.login-screen .sub { font-size: 14px; color: var(--muted-foreground); margin-bottom: 28px; }
+.biometric-row { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 6px; color: var(--muted-foreground); font-size: 12px; }
+.biometric-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--muted); display: flex; align-items: center; justify-content: center; color: var(--muted-foreground); }
+.lang-toggle { margin-top: auto; display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+.lang-toggle button { padding: 6px 16px; font-size: 12px; font-weight: 600; border: none; background: var(--card); color: var(--muted-foreground); cursor: pointer; }
+.lang-toggle button.active { background: var(--primary); color: var(--primary-foreground); }
+.home-screen { height: 100%; display: flex; flex-direction: column; background: var(--background); overflow: hidden; }
+.home-scroll { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 100px; }
+.home-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.home-header h2 { font-size: 20px; font-weight: 700; color: var(--foreground); }
+.welcome-name { font-size: 18px; font-weight: 600; color: var(--foreground); }
+.welcome-role { display: inline-block; padding: 2px 10px; background: #e0e7ff; color: var(--primary); border-radius: var(--radius-full); font-size: 10px; font-weight: 600; margin-top: 4px; }
+.stats-row { display: flex; gap: 8px; margin-bottom: 20px; }
+.stat-card { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px; text-align: center; box-shadow: var(--shadow-sm); }
+.stat-num { font-size: 24px; font-weight: 700; }
+.stat-label { font-size: 11px; color: var(--muted-foreground); margin-top: 2px; }
+.flow-card { padding: 16px; border-radius: var(--radius-lg); margin-bottom: 10px; cursor: pointer; transition: transform 0.1s; }
+.flow-card:active { transform: scale(0.98); }
+.flow-card-inner { display: flex; align-items: center; gap: 12px; }
+.flow-icon-box { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
+.flow-card-title { font-size: 15px; font-weight: 600; }
+.flow-card-desc { font-size: 12px; opacity: 0.8; }
+.recent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; margin-top: 6px; }
+.recent-header-title { font-size: 14px; font-weight: 600; color: var(--foreground); }
+.recent-header-link { font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 500; }
+.shell-content { height: 100%; display: flex; flex-direction: column; }
+.offline-banner { background: rgba(245,158,11,0.12); color: #92400e; font-size: 10px; padding: 6px 14px; text-align: center; font-weight: 500; }
+.shell-body { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; padding: 24px; color: var(--muted-foreground); background: var(--background); }
+.placeholder-grid { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; opacity: 0.5; }
+.placeholder-card { height: 90px; background: var(--card); border: 1px dashed var(--input); border-radius: var(--radius-md); }
+.queue-screen { height: 100%; display: flex; flex-direction: column; background: var(--background); }
+.queue-header { padding: 10px 16px 6px; background: var(--background); position: sticky; top: 0; z-index: 5; }
+.queue-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.queue-header h2 { font-size: 18px; font-weight: 700; color: var(--foreground); }
+.outlet-row { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--primary); font-weight: 600; margin-bottom: 10px; }
+.filter-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.filter-chips::-webkit-scrollbar { display: none; }
+.ticket-list { flex: 1; overflow-y: auto; padding: 0 16px 90px; }
+.ticket-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 8px; cursor: pointer; transition: transform 0.1s; box-shadow: var(--shadow-sm); }
+.ticket-card:active { transform: scale(0.98); }
+.ticket-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.ticket-id { font-family: var(--font-mono); font-size: 11px; color: var(--primary); font-weight: 600; }
+.ticket-time { font-size: 10px; color: var(--muted-foreground); }
+.ticket-device { font-size: 13px; font-weight: 600; color: var(--foreground); margin-bottom: 1px; }
+.ticket-customer { font-size: 11px; color: var(--muted-foreground); margin-bottom: 3px; }
+.ticket-issue { font-size: 11px; color: var(--muted-foreground); opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ticket-card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+.ticket-card .chevron { color: var(--border); }
+.new-ticket-screen { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.new-ticket-scroll { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 140px; background: var(--background); }
+.camera-area { width: 100%; aspect-ratio: 4/5; border: 2px dashed var(--accent); border-radius: var(--radius-xl); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: var(--muted); margin-bottom: 16px; position: relative; }
+.camera-area .corner { position: absolute; width: 20px; height: 20px; border: 2px solid var(--accent); }
+.corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+.corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+.corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+.corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+.camera-icon { width: 44px; height: 44px; color: var(--muted-foreground); }
+.camera-label { font-size: 14px; color: var(--muted-foreground); font-weight: 500; text-align: center; padding: 0 16px; }
+.camera-sub { font-size: 12px; color: var(--muted-foreground); opacity: 0.6; text-align: center; }
+.device-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; text-align: center; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+.device-icon { width: 44px; height: 44px; margin: 0 auto 10px; color: var(--muted-foreground); }
+.device-name { font-size: 18px; font-weight: 600; color: var(--foreground); margin-bottom: 3px; }
+.device-color { font-size: 12px; color: var(--muted-foreground); margin-bottom: 6px; }
+.confidence { font-size: 12px; color: var(--secondary); font-weight: 600; }
+.device-actions { display: flex; gap: 8px; margin-top: 12px; }
+.damage-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px; margin-bottom: 14px; }
+.damage-header { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-foreground); font-weight: 600; margin-bottom: 8px; }
+.damage-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--muted); }
+.damage-item:last-child { border-bottom: none; }
+.damage-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.dot-yellow { background: var(--accent); }
+.dot-red { background: var(--destructive); }
+.dot-green { background: #10b981; }
+.damage-info { flex: 1; }
+.damage-type { font-size: 14px; font-weight: 600; color: var(--foreground); }
+.damage-loc { font-size: 12px; color: var(--muted-foreground); margin-top: 1px; }
+.thumbnail { width: 36px; height: 36px; border-radius: 5px; background: var(--muted); border: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--muted-foreground); font-size: 9px; }
+.customer-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px; margin-bottom: 14px; }
+.submit-section { padding: 14px; background: var(--card); border-top: 1px solid var(--border); position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; }
+.submit-note { font-size: 10px; color: var(--muted-foreground); text-align: center; margin-top: 6px; }
+.overview-screen { height: 100%; overflow-y: auto; padding: 20px 20px 30px; background: var(--background); }
+.overview-header { text-align: center; margin-bottom: 24px; }
+.overview-header .logo-box { margin: 0 auto 14px; }
+.overview-header h2 { font-size: 20px; font-weight: 700; color: var(--foreground); }
+.overview-header p { font-size: 14px; color: var(--muted-foreground); margin-top: 3px; }
+.build-list { display: flex; flex-direction: column; gap: 6px; }
+.build-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; display: flex; align-items: flex-start; gap: 10px; box-shadow: var(--shadow-sm); }
+.build-num { width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: var(--primary-foreground); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.build-info h4 { font-size: 12px; font-weight: 700; color: var(--foreground); margin-bottom: 1px; }
+.build-info p { font-size: 11px; color: var(--muted-foreground); }
+.principles { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+.principles h3 { font-size: 14px; font-weight: 700; color: var(--foreground); margin-bottom: 10px; }
+.principle-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 12px; color: var(--muted-foreground); }
+.principle-item .bullet { width: 5px; height: 5px; border-radius: 50%; background: var(--primary); margin-top: 4px; flex-shrink: 0; }
+.detail-screen { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.detail-header { padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; background: var(--card); }
+.detail-header h2 { font-size: 18px; font-weight: 600; color: var(--foreground); flex: 1; }
+
+/* Modern header — no back arrow, text actions, centered title */
+.modern-header {
+  padding: 14px 16px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--background);
+}
+.modern-header-left {
+  min-width: 64px;
+  display: flex;
+  align-items: center;
+}
+.modern-header-center {
+  flex: 1;
+  text-align: center;
+}
+.modern-header-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1.2;
+}
+.modern-header-subtitle {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+.modern-header-right {
+  min-width: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.header-action-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+}
+.header-action-outline {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 5px 12px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  height: 32px;
+}
+.header-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+}
+.detail-scroll { flex: 1; overflow-y: auto; padding: 16px 16px 30px; background: var(--background); }
+.device-customer-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; display: flex; gap: 14px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+.device-side { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 35%; }
+.device-img { width: 64px; height: 64px; border-radius: var(--radius-md); background: var(--muted); display: flex; align-items: center; justify-content: center; color: var(--muted-foreground); }
+.customer-side { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.customer-name { font-size: 16px; font-weight: 700; color: var(--foreground); }
+.customer-phone { font-size: 14px; color: var(--primary); font-weight: 500; }
+.whatsapp-btn { margin-top: 4px; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 12px; font-weight: 600; color: var(--secondary); background: var(--card); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; }
+.notes-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px; }
+.notes-card h4 { font-size: 13px; font-weight: 600; color: var(--muted-foreground); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.notes-text { font-size: 14px; color: var(--foreground); line-height: 1.5; }
+.price-breakdown { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px; }
+.price-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--foreground); margin-bottom: 4px; }
+.price-total { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 8px; display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; color: var(--primary); }
+.action-buttons { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.assessment-screen { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.assessment-scroll { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 220px; background: var(--background); }
+.suggestion-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 8px; cursor: pointer; position: relative; padding-left: 16px; transition: all 0.15s; }
+.suggestion-card.selected { border-color: var(--primary); border-width: 2px; }
+.suggestion-card.selected::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; background: var(--primary); border-radius: 0 2px 2px 0; }
+.suggestion-name { font-size: 14px; font-weight: 600; color: var(--foreground); }
+.suggestion-meta { font-size: 12px; color: var(--muted-foreground); margin-top: 3px; }
+.radio-circle { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.radio-circle.selected { background: var(--primary); border-color: var(--primary); color: var(--primary-foreground); font-size: 10px; }
+.part-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--muted); }
+.part-row:last-child { border-bottom: none; }
+.part-name { font-size: 14px; color: var(--foreground); }
+.part-price { font-size: 13px; color: var(--muted-foreground); font-family: var(--font-mono); }
+.stepper { display: flex; align-items: center; gap: 6px; }
+.stepper-btn { width: 28px; height: 28px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--card); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--foreground); cursor: pointer; }
+.sticky-price { background: var(--card); border-top: 1px solid var(--border); padding: 14px 16px; box-shadow: 0 -2px 10px rgba(0,0,0,0.04); position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; }
+.eta-option { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+.eta-label { font-size: 14px; color: var(--foreground); }
+.quick-repair-screen { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.quick-scroll { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 200px; background: var(--background); }
+.issue-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 8px; cursor: pointer; position: relative; transition: all 0.15s; }
+.issue-card.selected { border-color: var(--primary); border-width: 2px; padding-left: 16px; }
+.issue-card.selected::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; background: var(--primary); border-radius: 0 2px 2px 0; }
+.issue-name { font-size: 14px; font-weight: 600; color: var(--foreground); display: flex; justify-content: space-between; }
+.issue-meta { font-size: 12px; color: var(--muted-foreground); margin-top: 3px; }
+.issue-parts { font-size: 11px; color: var(--muted-foreground); opacity: 0.6; margin-top: 4px; }
+.price-sticky { background: var(--card); border-top: 1px solid var(--border); padding: 14px 16px; position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; }
+.price-sticky .total-row { display: flex; justify-content: space-between; align-items: center; }
+.price-sticky .total-label { font-size: 16px; font-weight: 700; color: var(--foreground); }
+.voice-screen { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; background: var(--background); }
+.mic-big { width: 80px; height: 80px; color: var(--primary); margin-bottom: 20px; }
+.voice-prompt { font-size: 20px; font-weight: 700; color: var(--foreground); margin-bottom: 6px; text-align: center; }
+.voice-sub { font-size: 14px; color: var(--muted-foreground); text-align: center; margin-bottom: 16px; }
+.voice-example { font-size: 12px; color: var(--muted-foreground); opacity: 0.5; text-align: center; font-style: italic; }
+.payment-screen { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.payment-scroll { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 140px; background: var(--background); }
+.payment-method { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--muted); cursor: pointer; min-height: 48px; }
+.payment-method:last-child { border-bottom: none; }
+.method-icon { font-size: 20px; }
+.method-label { font-size: 14px; color: var(--foreground); flex: 1; }
+.inventory-preview { background: rgba(20,184,166,0.06); border: 1px solid rgba(20,184,166,0.2); border-radius: var(--radius-md); padding: 10px; margin-top: 8px; }
+.inventory-preview h5 { font-size: 11px; color: var(--secondary); font-weight: 600; margin-bottom: 6px; }
+.inventory-item { font-size: 12px; color: var(--foreground); margin-bottom: 2px; }
+.profile-screen { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.profile-scroll { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 80px; background: var(--background); }
+.user-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+.avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: var(--primary-foreground); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; flex-shrink: 0; }
+.user-info { flex: 1; }
+.user-name { font-size: 16px; font-weight: 700; color: var(--foreground); }
+.user-role { display: inline-block; padding: 2px 10px; background: #e0e7ff; color: var(--primary); border-radius: var(--radius-full); font-size: 10px; font-weight: 600; margin-top: 3px; }
+.user-outlet { font-size: 12px; color: var(--muted-foreground); margin-top: 2px; }
+.settings-list { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 14px; }
+.settings-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--muted); cursor: pointer; min-height: 48px; }
+.settings-row:last-child { border-bottom: none; }
+.settings-row svg { color: var(--muted-foreground); flex-shrink: 0; }
+.settings-label { font-size: 14px; color: var(--foreground); flex: 1; }
+.settings-value { font-size: 14px; color: var(--muted-foreground); }
+.history-screen { height: 100%; display: flex; flex-direction: column; overflow: hidden; background: var(--background); }
+.history-header { padding: 12px 16px; background: var(--background); border-bottom: 1px solid var(--border); }
+.search-bar { height: 40px; background: var(--card); border: 1px solid var(--input); border-radius: var(--radius-md); display: flex; align-items: center; padding: 0 12px; gap: 8px; color: var(--muted-foreground); font-size: 14px; margin-bottom: 8px; }
+.date-header { font-size: 11px; font-weight: 600; color: var(--muted-foreground); padding: 8px 16px; background: var(--background); position: sticky; top: 0; }
+.dead-device-screen { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.dead-scroll { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 100px; background: var(--background); }
+.warning-card { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.15); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; text-align: center; }
+.warning-card .warning-icon { color: var(--destructive); margin-bottom: 8px; }
+.warning-card h3 { font-size: 15px; font-weight: 700; color: var(--destructive); margin-bottom: 4px; }
+.warning-card p { font-size: 13px; color: var(--destructive); opacity: 0.8; }
+.option-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px; transition: all 0.15s; }
+.option-card.selected { border-color: var(--primary); border-width: 2px; }
+.option-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: var(--primary-foreground); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.option-info h4 { font-size: 14px; font-weight: 700; color: var(--foreground); margin-bottom: 2px; }
+.option-info p { font-size: 12px; color: var(--muted-foreground); }
+.price-change-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: var(--radius-md); padding: 12px; margin-bottom: 14px; }
+.price-change-warning h4 { font-size: 14px; font-weight: 700; color: #d97706; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.price-change-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--foreground); margin-bottom: 3px; }
+.price-change-warning .warn-text { font-size: 13px; color: var(--destructive); margin-top: 6px; }
+.qr-screen { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; background: var(--background); text-align: center; }
+.qr-header { margin-bottom: 16px; }
+.qr-ticket-id { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--foreground); margin-bottom: 4px; }
+.qr-device { font-size: 14px; color: var(--foreground); }
+.qr-issue { font-size: 13px; color: var(--muted-foreground); margin-bottom: 6px; }
+.qr-box { width: 180px; height: 180px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 12px; color: var(--muted-foreground); position: relative; }
+.qr-box::before { content: ''; position: absolute; inset: 20px; border: 2px solid var(--primary); border-radius: 4px; }
+.qr-box::after { content: ''; position: absolute; width: 40px; height: 40px; background: var(--primary); border-radius: 4px; }
+.qr-instruction { font-size: 13px; color: var(--muted-foreground); margin-bottom: 12px; }
+.qr-outlet { font-size: 12px; color: var(--muted-foreground); opacity: 0.7; margin-bottom: 16px; }
+.qr-actions { display: flex; gap: 8px; width: 100%; }
+.qr-actions .btn { flex: 1; margin-top: 0; }
+.success-screen { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; background: var(--background); text-align: center; }
+.success-icon { width: 64px; height: 64px; color: var(--secondary); margin-bottom: 16px; }
+.success-title { font-size: 20px; font-weight: 700; color: var(--foreground); margin-bottom: 6px; }
+.success-desc { font-size: 14px; color: var(--muted-foreground); margin-bottom: 16px; }
+.success-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; width: 100%; margin-bottom: 16px; text-align: left; box-shadow: var(--shadow-sm); }
+.success-card-row { font-size: 14px; color: var(--foreground); margin-bottom: 4px; }
+.success-actions { display: flex; gap: 8px; width: 100%; }
+.success-actions .btn { flex: 1; margin-top: 0; }
+.assess-prompt { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 24px; width: 90%; max-width: 320px; text-align: center; box-shadow: var(--shadow-lg); }
+.assess-prompt h3 { font-size: 18px; font-weight: 700; color: var(--foreground); margin-bottom: 6px; }
+.assess-prompt p { font-size: 14px; color: var(--muted-foreground); margin-bottom: 14px; }
+.icon { width: 18px; height: 18px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+    <h1>Mobile Wireframes</h1>
+    <p class="subtitle">Repair Intake App<br>Common flow branches into 3 paths &middot; 16 screens</p>
+
+    <div class="flow-header"><span class="flow-dot a"></span>Common Flow</div>
+
+    <div class="nav-item" data-screen="screen1">
+      <div class="num">1</div>
+      <div class="info"><div class="title">Login</div><div class="desc">Entry point &mdash; all flows</div></div>
+    </div>
+    <div class="nav-item active" data-screen="screen_home">
+      <div class="num">2</div>
+      <div class="info"><div class="title">Home / Intake Landing</div><div class="desc">Choose A, B, or C from here</div></div>
+    </div>
+
+    <div class="flow-header" style="padding-left: 20px;"><span class="flow-dot a"></span>&rarr; Flow A: Full AI (30&ndash;90s)</div>
+
+    <div class="nav-item" data-screen="screen4">
+      <div class="num">3</div>
+      <div class="info"><div class="title">New Ticket (Full AI)</div><div class="desc">Camera, AI vision, damage</div></div>
+    </div>
+    <div class="nav-item" data-screen="screen15">
+      <div class="num">4</div>
+      <div class="info"><div class="title">Success / Confirmation</div><div class="desc">Ticket created, WhatsApp sent</div></div>
+    </div>
+    <div class="nav-item" data-screen="screen6">
+      <div class="num">5</div>
+      <div class="info"><div class="title">Ticket Detail</div><div class="desc">Device, timeline, actions</div></div>
+    </div>
+    <div class="nav-item" data-screen="screen7">
+      <div class="num">6</div>
+      <div class="info"><div class="title">Assessment</div><div class="desc">AI diagnosis, parts, labour</div></div>
+    </div>
+    <div class="nav-item" data-screen="screen13">
+      <div class="num">7</div>
+      <div class="info"><div class="title">Dead Device / Unknown</div><div class="desc">Edge case: won&rsquo;t power on</div></div>
+    </div>
+    <div class="nav-item" data-screen="screen10">
+      <div class="num">8</div>
+      <div class="info"><div class="title">Payment &amp; Receipt</div><div class="desc">Record payment, decrement stock</div></div>
+    </div>
+
+    <div class="flow-header" style="padding-left: 20px;"><span class="flow-dot b"></span>&rarr; Flow B: Quick Repair (&lt;10s)</div>
+
+    <div class="nav-item" data-screen="screen8">
+      <div class="num">9</div>
+      <div class="info"><div class="title">Quick Repair</div><div class="desc">Typeahead + quick-select issue</div></div>
+    </div>
+
+    <div class="flow-header" style="padding-left: 20px;"><span class="flow-dot c"></span>&rarr; Flow C: Voice Intake (&lt;5s)</div>
+
+    <div class="nav-item" data-screen="screen9">
+      <div class="num">10</div>
+      <div class="info"><div class="title">Voice Intake</div><div class="desc">Mic, extraction, confirmation</div></div>
+    </div>
+
+    <div class="flow-header"><span class="flow-dot shared"></span>Shared Screens</div>
+
+    <div class="nav-item" data-screen="screen3">
+      <div class="num">11</div>
+      <div class="info"><div class="title">Jobs Queue</div><div class="desc">Full ticket list, filters</div></div>
+    </div>
+    <div class="nav-item" data-screen="screen14">
+      <div class="num">12</div>
+      <div class="info"><div class="title">QR Receipt</div><div class="desc">No-phone receipt display</div></div>
+    </div>
+    <div class="nav-item" data-screen="screen11">
+      <div class="num">13</div>
+      <div class="info"><div class="title">Profile &amp; Settings</div><div class="desc">User info, dark mode, logout</div></div>
+    </div>
+    <div class="nav-item" data-screen="screen12">
+      <div class="num">14</div>
+      <div class="info"><div class="title">History</div><div class="desc">Past tickets, search, filters</div></div>
+    </div>
+
+    <div class="flow-header"><span class="flow-dot ref"></span>Reference</div>
+
+    <div class="nav-item" data-screen="screen2">
+      <div class="num">15</div>
+      <div class="info"><div class="title">Navigation Shell</div><div class="desc">Tab bar, offline banner</div></div>
+    </div>
+    <div class="nav-item" data-screen="screen5">
+      <div class="num">16</div>
+      <div class="info"><div class="title">Build Order / Overview</div><div class="desc">Architecture &amp; design principles</div></div>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="phone-frame">
+      <div class="phone-screen" id="screen1">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="login-screen">
+          <div class="logo-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+          <h2>Selamat Datang</h2>
+          <p class="sub">Log masuk ke akaun anda</p>
+          <div class="input-group"><label>Emel</label><div class="input-box">alamat@emel.com</div></div>
+          <div class="input-group"><label>Kata Laluan</label><div class="input-box with-icon"><span>&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;</span><svg class="icon eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div></div>
+          <button class="btn btn-primary">Log Masuk</button>
+          <div class="divider">atau</div>
+          <button class="btn btn-ghost">Lupa kata laluan?</button>
+          <div class="biometric-row">
+            <div class="biometric-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4-8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <span>Log masuk dengan Face ID</span>
+          </div>
+          <div class="lang-toggle"><button class="active">BM</button><button>EN</button></div>
+        </div>
+      </div>
+      <div class="phone-screen active" id="screen_home">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="home-screen">
+          <div class="home-scroll">
+            <div class="home-header">
+              <h2>Repair Intake</h2>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--foreground)" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <div style="font-size: 14px; color: var(--muted-foreground);">Selamat datang,</div>
+              <div class="welcome-name">Amir</div>
+              <div class="welcome-role">Teknikal &middot; Dungun 1</div>
+            </div>
+            <div class="stats-row">
+              <div class="stat-card">
+                <div class="stat-num" style="color: var(--primary);">4</div>
+                <div class="stat-label">Tugas hari ini</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num" style="color: var(--accent);">1</div>
+                <div class="stat-label">Menunggu</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num" style="color: var(--secondary);">0</div>
+                <div class="stat-label">Siap</div>
+              </div>
+            </div>
+            <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: var(--foreground);">Intake Baru</div>
+            <div class="flow-card" style="background: var(--primary); color: var(--primary-foreground);">
+              <div class="flow-card-inner">
+                <div class="flow-icon-box" style="background: rgba(255,255,255,0.2);">&#x1F4F7;</div>
+                <div style="flex: 1;">
+                  <div class="flow-card-title">Tiket Baharu</div>
+                  <div class="flow-card-desc">Kamera + AI Vision &middot; 30&ndash;90 saat</div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.6;"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+            <div class="flow-card" style="background: var(--accent); color: var(--accent-foreground);">
+              <div class="flow-card-inner">
+                <div class="flow-icon-box" style="background: rgba(0,0,0,0.08);">&#x26A1;</div>
+                <div style="flex: 1;">
+                  <div class="flow-card-title">Baiki Cepat</div>
+                  <div class="flow-card-desc">Typeahead, masalah biasa &middot; &lt;10 saat</div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.5;"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+            <div class="flow-card" style="background: var(--secondary); color: var(--secondary-foreground); margin-bottom: 16px;">
+              <div class="flow-card-inner">
+                <div class="flow-icon-box" style="background: rgba(255,255,255,0.2);">&#x1F3A4;</div>
+                <div style="flex: 1;">
+                  <div class="flow-card-title">Ambil Suara</div>
+                  <div class="flow-card-desc">Sebut masalah &middot; &lt;5 saat</div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.6;"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+            <div class="recent-header">
+              <div class="recent-header-title">Tugas Terkini</div>
+              <div class="recent-header-link">Lihat Semua &rarr;</div>
+            </div>
+            <div class="ticket-card">
+              <div class="ticket-card-top"><span class="ticket-id">#D1-042</span><span class="ticket-time">10m lalu</span></div>
+              <div class="ticket-device">iPhone 14 Pro</div>
+              <div class="ticket-customer">Ahmad bin Abdullah</div>
+              <div class="ticket-issue">"Skrin pecah, sentuh rosak"</div>
+              <div class="ticket-card-bottom"><span class="status-badge badge-received">Diterima</span><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+            <div class="ticket-card">
+              <div class="ticket-card-top"><span class="ticket-id">#D1-041</span><span class="ticket-time">35m lalu</span></div>
+              <div class="ticket-device">Samsung Galaxy S23</div>
+              <div class="ticket-customer">Siti Nurhaliza</div>
+              <div class="ticket-issue">"Bateri cepat habis, peranti panas"</div>
+              <div class="ticket-card-bottom"><span class="status-badge badge-assessing">Sedang Dinilai</span><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+          </div>
+          <div class="tab-bar">
+            <div class="tab-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Utama</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 14l2 2 4-4"/></svg><span>Tugas</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.8 2.3A.5.5 0 0 0 4 2.7v18.6a.5.5 0 0 0 .8.4l12-9.3a.5.5 0 0 0 0-.8l-12-9.3Z"/><circle cx="19" cy="12" r="2"/></svg><span>Nilai</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Sejarah</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 1-4-4H8a4 4 0 0 1-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen2">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="shell-content">
+          <div class="offline-banner">Tiada sambungan &mdash; data disimpan secara tempatan</div>
+          <div class="shell-body">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            <span style="font-size:14px;color:#9ca3af;font-weight:500;">Navigation Shell</span>
+            <p style="font-size:12px;color:#d1d5db;text-align:center;">Tab bar + Offline banner.<br>Content screens push over this shell.</p>
+            <div class="placeholder-grid"><div class="placeholder-card"></div><div class="placeholder-card"></div><div class="placeholder-card"></div><div class="placeholder-card"></div></div>
+          </div>
+          <div class="tab-bar">
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Utama</span></div>
+            <div class="tab-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 14l2 2 4-4"/></svg><span>Tugas</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.8 2.3A.5.5 0 0 0 4 2.7v18.6a.5.5 0 0 0 .8.4l12-9.3a.5.5 0 0 0 0-.8l-12-9.3Z"/><circle cx="19" cy="12" r="2"/></svg><span>Nilai</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Sejarah</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 1-4-4H8a4 4 0 0 1-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-screen" id="screen3">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="queue-screen">
+          <div class="queue-header">
+            <div class="queue-header-top">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+              <h2>Senarai Tugas</h2>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div class="outlet-row"><span>Dungun 1</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="filter-chips"><div class="chip active">Semua</div><div class="chip">Diterima</div><div class="chip">Sedang Dinilai</div><div class="chip">Selesai</div></div>
+          </div>
+          <div class="ticket-list">
+            <div class="ticket-card"><div class="ticket-card-top"><span class="ticket-id">#D1-042</span><span class="ticket-time">10m lalu</span></div><div class="ticket-device">iPhone 14 Pro</div><div class="ticket-customer">Ahmad bin Abdullah</div><div class="ticket-issue">"Skrin pecah, sentuh rosak"</div><div class="ticket-card-bottom"><span class="status-badge badge-received">Diterima</span><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+            <div class="ticket-card"><div class="ticket-card-top"><span class="ticket-id">#D1-041</span><span class="ticket-time">35m lalu</span></div><div class="ticket-device">Samsung Galaxy S23</div><div class="ticket-customer">Siti Nurhaliza</div><div class="ticket-issue">"Bateri cepat habis, peranti panas"</div><div class="ticket-card-bottom"><span class="status-badge badge-assessing">Sedang Dinilai</span><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+            <div class="ticket-card"><div class="ticket-card-top"><span class="ticket-id">#D1-040</span><span class="ticket-time">2j lalu</span></div><div class="ticket-device">iPhone 12</div><div class="ticket-customer">Muhammad Faiz</div><div class="ticket-issue">"Butang home tidak berfungsi"</div><div class="ticket-card-bottom"><span class="status-badge badge-completed">Siap</span><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+            <div class="ticket-card"><div class="ticket-card-top"><span class="ticket-id">#D1-039</span><span class="ticket-time">5j lalu</span></div><div class="ticket-device">Samsung Galaxy A54</div><div class="ticket-customer">Lee Wei Ming</div><div class="ticket-issue">"Tiada bunyi semasa panggilan"</div><div class="ticket-card-bottom"><span class="status-badge badge-received">Diterima</span><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+          </div>
+          <div class="tab-bar">
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Utama</span></div>
+            <div class="tab-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 14l2 2 4-4"/></svg><span>Tugas</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.8 2.3A.5.5 0 0 0 4 2.7v18.6a.5.5 0 0 0 .8.4l12-9.3a.5.5 0 0 0 0-.8l-12-9.3Z"/><circle cx="19" cy="12" r="2"/></svg><span>Nilai</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Sejarah</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 1-4-4H8a4 4 0 0 1-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen4">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="new-ticket-screen">
+          <div class="modern-header">
+            <div class="modern-header-left">
+              <button class="header-action-text">Batal</button>
+            </div>
+            <div class="modern-header-center">
+              <div class="modern-header-title">Tiket Baharu</div>
+            </div>
+            <div class="modern-header-right"></div>
+          </div>
+          <div class="new-ticket-scroll">
+            <div class="camera-area">
+              <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
+              <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <div class="camera-label">Ketuk untuk ambil gambar peranti</div>
+              <div class="camera-sub">Pastikan keseluruhan bahagian belakang kelihatan</div>
+            </div>
+            <div class="section-title">Keputusan AI</div>
+            <div class="device-card">
+              <svg class="device-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              <div class="device-name">iPhone 14 Pro</div>
+              <div class="device-color">Ungu Tua (Deep Purple)</div>
+              <div class="confidence">Keyakinan: 94% &#10003;</div>
+              <div class="device-actions"><button class="btn-sm btn-primary">Betul</button><button class="btn-sm btn-outline">Tidak, pilih manual</button></div>
+            </div>
+            <div class="damage-section">
+              <div class="damage-header"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Keadaan Peranti (Sebelum Pembaikan)</div>
+              <div class="damage-item"><div class="damage-dot dot-yellow"></div><div class="damage-info"><div class="damage-type">Goresan halus</div><div class="damage-loc">Lokasi: Panel belakang</div></div><div class="thumbnail">IMG</div></div>
+              <div class="damage-item"><div class="damage-dot dot-red"></div><div class="damage-info"><div class="damage-type">Retakan &mdash; Sederhana</div><div class="damage-loc">Lokasi: Skrin</div></div><div class="thumbnail">IMG</div></div>
+              <div class="damage-item"><div class="damage-dot dot-green"></div><div class="damage-info"><div class="damage-type">Tiada kerosakan air</div></div></div>
+            </div>
+            <div class="customer-section">
+              <div class="section-title" style="margin-top:0;margin-bottom:10px;">Nota Pelanggan</div>
+              <div class="textarea-box">Apa masalah yang pelanggan nyatakan?</div>
+              <div style="display:flex;gap:8px;margin-bottom:10px;"><span style="padding:4px 10px;background:rgba(245,158,11,0.12);color:#d97706;border-radius:100px;font-size:11px;font-weight:600;">Skrin &mdash; Pecah</span><span style="padding:4px 10px;background:rgba(239,68,68,0.1);color:#dc2626;border-radius:100px;font-size:11px;font-weight:600;">Sentuh &mdash; Rosak</span></div>
+            </div>
+            <div class="customer-section">
+              <div class="section-title" style="margin-top:0;margin-bottom:10px;">Maklumat Pelanggan</div>
+              <div class="field-row"><label class="field-label">Nama</label><div class="input-box">Nama penuh</div></div>
+              <div class="field-row"><label class="field-label">Telefon</label><div class="input-box">+60</div></div>
+              <div class="field-row"><label class="field-label">Emel (pilihan)</label><div class="input-box">alamat@emel.com</div></div>
+            </div>
+          </div>
+          <div class="submit-section">
+            <button class="btn btn-primary">Hantar ke Teknikal</button>
+            <div class="submit-note">Tiada harga diberikan lagi</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen5">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="overview-screen">
+          <div class="overview-header">
+            <div class="logo-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+            <h2>Repair Intake</h2>
+            <p>Mobile UI Specs &mdash; Build Order</p>
+          </div>
+          <div class="build-list">
+            <div class="build-item"><div class="build-num">A</div><div class="build-info"><h4>Flow A: Front Desk Intake (Full AI)</h4><p>Login &rarr; Queue &rarr; Camera intake &rarr; AI device ID &rarr; Success &rarr; Technician assessment &rarr; Payment. 2-person handoff or solo technician.</p></div></div>
+            <div class="build-item"><div class="build-num">B</div><div class="build-info"><h4>Flow B: Quick Repair (Counter)</h4><p>Typeahead device &rarr; quick-select issue &rarr; auto-approved &rarr; straight to In Progress. No camera, no AI vision. &lt;10 seconds.</p></div></div>
+            <div class="build-item"><div class="build-num">C</div><div class="build-info"><h4>Flow C: Voice Intake</h4><p>Speak into mic &rarr; AI extracts device, issue, customer, price &rarr; confirm &rarr; auto-approved. &lt;5 seconds.</p></div></div>
+          </div>
+          <div class="principles">
+            <h3>Key Design Principles</h3>
+            <div class="principle-item"><div class="bullet"></div><span>3 graduated intake tiers: Voice (&lt;5s), Quick Repair (&lt;10s), Full AI (30&ndash;90s)</span></div>
+            <div class="principle-item"><div class="bullet"></div><span>Camera-first intake &mdash; inline 4:5 capture with amber corner brackets</span></div>
+            <div class="principle-item"><div class="bullet"></div><span>Indigo primary (#4f46e5) + amber accent (#f59e0b) + teal secondary (#14b8a6)</span></div>
+            <div class="principle-item"><div class="bullet"></div><span>AI suggestions as tappable radio cards with confidence %</span></div>
+            <div class="principle-item"><div class="bullet"></div><span>Payment = POS: record, decrement stock, WhatsApp/QR receipt</span></div>
+            <div class="principle-item"><div class="bullet"></div><span>Bahasa Melayu formal (DM Sans). No auto-translate &mdash; manual copy from 04-ui-copy.md</span></div>
+            <div class="principle-item"><div class="bullet"></div><span>Offline-first: AsyncStorage queue with amber sync banner</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen6">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="detail-screen">
+          <div class="modern-header">
+            <div class="modern-header-left">
+              <button class="header-action-text">Kembali</button>
+            </div>
+            <div class="modern-header-center">
+              <div class="modern-header-title" style="font-family: var(--font-mono);">#D1-042</div>
+            </div>
+            <div class="modern-header-right">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </div>
+          </div>
+          <div class="detail-scroll">
+            <div class="device-customer-card">
+              <div class="device-side">
+                <div class="device-img"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+                <div style="font-size:12px;font-weight:600;color:#111827;text-align:center;">iPhone 14 Pro</div>
+                <div style="font-size:11px;color:#9ca3af;text-align:center;">Ungu Tua</div>
+                <button class="btn-ghost" style="font-size:10px;margin-top:0;">Lihat gambar</button>
+              </div>
+              <div class="customer-side">
+                <div class="customer-name">Ahmad bin Abdullah</div>
+                <div class="customer-phone">+6012-345-6789</div>
+                <button class="whatsapp-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Hubungi di WhatsApp</button>
+              </div>
+            </div>
+            <div class="section-title">Status</div>
+            <div class="timeline">
+              <div class="timeline-item"><div class="timeline-dot dot-current"></div><div><div class="timeline-label current">Diterima</div><div class="timeline-time">04 Jun 2026, 10:32 AM</div></div></div>
+              <div class="timeline-item"><div class="timeline-dot dot-future"></div><div class="timeline-label future">Sedang Dinilai</div></div>
+              <div class="timeline-item"><div class="timeline-dot dot-future"></div><div class="timeline-label future">Selesai Dinilai</div></div>
+              <div class="timeline-item"><div class="timeline-dot dot-future"></div><div class="timeline-label future">Dalam Proses</div></div>
+              <div class="timeline-item"><div class="timeline-dot dot-future"></div><div class="timeline-label future">Siap</div></div>
+            </div>
+            <div class="section-title">Nota</div>
+            <div class="notes-card">
+              <h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Nota Pelanggan</h4>
+              <div class="notes-text">"Skrin pecah, sentuh rosak. Pernah jatuh semalam."</div>
+            </div>
+            <div class="section-title">Tindakan</div>
+            <div class="action-buttons">
+              <button class="btn btn-primary">Buka Penilaian</button>
+              <button class="btn btn-outline">Hantar WhatsApp</button>
+              <button class="btn btn-outline">Kemaskini Status</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen7">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="assessment-screen">
+          <div class="modern-header">
+            <div class="modern-header-left">
+              <button class="header-action-text">Kembali</button>
+            </div>
+            <div class="modern-header-center">
+              <div class="modern-header-title">Penilaian</div>
+              <div class="modern-header-subtitle">#D1-042</div>
+            </div>
+            <div class="modern-header-right">
+              <button class="header-action-outline">Simpan Draf</button>
+            </div>
+          </div>
+          <div class="assessment-scroll">
+            <div class="section-title" style="display:flex;align-items:center;gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Cadangan Diagnosis</div>
+            <div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">AI berdasarkan iPhone 14 Pro + nota pelanggan</div>
+            <div class="suggestion-card selected">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="radio-circle selected">&#10003;</div>
+                <div style="flex:1;"><div class="suggestion-name">Penukaran Skrin OLED</div><div class="suggestion-meta">95% keyakinan &middot; 0.75 jam &middot; RM89 (part)</div></div>
+              </div>
+            </div>
+            <div class="suggestion-card">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="radio-circle"></div>
+                <div style="flex:1;"><div class="suggestion-name">Penukaran Bateri</div><div class="suggestion-meta">65% keyakinan &middot; 0.5 jam &middot; RM59 (part)</div></div>
+              </div>
+            </div>
+            <div class="card" style="border:1px dashed var(--input); background:var(--muted); margin-bottom:14px; cursor:pointer;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <div style="flex:1;">
+                  <div style="font-size:13px;font-weight:600;color:var(--foreground);">Peranti tidak boleh dihidupkan?</div>
+                  <div style="font-size:11px;color:var(--muted-foreground);">Pemeriksaan fizikal diperlukan &rarr;</div>
+                </div>
+              </div>
+            </div>
+            <div class="section-title">Bahagian</div>
+            <div class="card">
+              <div class="part-row">
+                <div><div class="part-name">Skrin OLED + Digitizer</div><div style="font-size:10px;color:#9ca3af;">Kos: RM89 &middot; Harga: RM179</div></div>
+                <div class="stepper"><button class="stepper-btn">&minus;</button><span style="font-size:12px;font-weight:600;">1</span><button class="stepper-btn">+</button></div>
+              </div>
+            </div>
+            <div class="section-title">Upah</div>
+            <div class="card">
+              <div class="field-row"><label class="field-label">Masa (jam)</label><div class="input-box" style="width:100px;">0.75</div></div>
+              <div class="field-row"><label class="field-label">Kadar</label><div style="font-size:12px;color:#4b5563;">RM50.00 / jam</div></div>
+              <div class="field-row"><label class="field-label">Jumlah</label><div style="font-size:16px;font-weight:700;color:#111827;">RM37.50</div></div>
+            </div>
+            <div class="section-title">Tempoh</div>
+            <div class="card">
+              <div class="eta-option"><div class="radio-circle selected">&#10003;</div><div class="eta-label" style="font-weight:600;">30&ndash;45 minit (tunggu)</div></div>
+              <div class="eta-option"><div class="radio-circle"></div><div class="eta-label">1&ndash;3 hari</div></div>
+              <div class="eta-option"><div class="radio-circle"></div><div class="eta-label">3&ndash;7 hari</div></div>
+            </div>
+            <div class="section-title">Nota Teknikal</div>
+            <div class="textarea-box">Skrin pecah di penjuru kanan bawah. Tiada kerosakan LCD.</div>
+          </div>
+          <div class="sticky-price">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#4b5563;margin-bottom:4px;"><span>Bahagian:</span><span>RM 94.00</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#4b5563;margin-bottom:4px;"><span>Upah:</span><span>RM 37.50</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#4b5563;margin-bottom:6px;"><span>Tambahan:</span><span>RM 0.00</span></div>
+            <div style="border-top:1px solid #e5e7eb;padding-top:6px;display:flex;justify-content:space-between;font-size:16px;font-weight:700;color:#111827;"><span>ANGGARAN:</span><span>RM 131.50</span></div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="btn btn-outline" style="flex:1;margin-top:0;">Simpan Draf</button>
+              <button class="btn btn-primary" style="flex:1;margin-top:0;">Hantar & Notify</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen8">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="quick-repair-screen">
+          <div class="modern-header">
+            <div class="modern-header-left">
+              <button class="header-action-text">Batal</button>
+            </div>
+            <div class="modern-header-center">
+              <div class="modern-header-title">Baiki Cepat</div>
+            </div>
+            <div class="modern-header-right">
+              <button class="header-icon-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="quick-scroll">
+            <div class="section-title">Peranti</div>
+            <div class="input-box" style="margin-bottom:14px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span style="margin-left:8px;">Cari peranti...</span></div>
+            <div class="section-title">Masalah</div>
+            <div class="issue-card selected">
+              <div class="issue-name"><span>Penukaran Skrin OLED</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="issue-meta">RM350 &middot; 0.75 jam</div>
+              <div class="issue-parts">1&times; Skrin OLED, 1&times; Gam perekat</div>
+            </div>
+            <div class="issue-card">
+              <div class="issue-name"><span>Penukaran Bateri</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="issue-meta">RM180 &middot; 0.5 jam</div>
+              <div class="issue-parts">1&times; Bateri, 1&times; Gam perekat</div>
+            </div>
+            <div class="issue-card">
+              <div class="issue-name"><span>Penukaran Port Pengecas</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="issue-meta">RM120 &middot; 0.5 jam</div>
+            </div>
+            <div class="section-title">Pelanggan (Pilihan)</div>
+            <div class="card">
+              <div class="field-row"><label class="field-label">Nama</label><div class="input-box">Nama pelanggan</div></div>
+              <div class="field-row"><label class="field-label">Telefon</label><div class="input-box">+6012-345-6789</div></div>
+              <div style="font-size:10px;color:#9ca3af;">Jika kosong, resit dengan kod QR akan dijana</div>
+            </div>
+          </div>
+          <div class="price-sticky">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#4b5563;margin-bottom:4px;"><span>Bahagian (1):</span><span>RM 339.00</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#4b5563;margin-bottom:6px;"><span>Upah (0.75j):</span><span>RM 11.00</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-size:15px;font-weight:700;color:#111827;">JUMLAH: RM 350.00</div><button class="btn-ghost" style="width:auto;font-size:12px;">Edit</button></div>
+            <button class="btn btn-accent" style="margin-top:10px;">HANTAR & CETAK RESIT</button>
+            <div style="font-size:10px;color:#9ca3af;text-align:center;margin-top:6px;">Pembaikan akan dimulakan serta-merta</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen9">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="voice-screen">
+          <svg class="mic-big" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          <div class="voice-prompt">Ketuk untuk rakam</div>
+          <div class="voice-sub">Sebut: peranti, masalah, pelanggan, harga</div>
+          <div class="voice-example">"iPhone 14 Pro skrin pecah, Ahmad, tiga ratus lima puluh"</div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen10">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="payment-screen">
+          <div class="modern-header">
+            <div class="modern-header-left">
+              <button class="header-action-text">Batal</button>
+            </div>
+            <div class="modern-header-center">
+              <div class="modern-header-title">Pembayaran</div>
+              <div class="modern-header-subtitle">#D1-043</div>
+            </div>
+            <div class="modern-header-right"></div>
+          </div>
+          <div class="payment-scroll">
+            <div class="card" style="margin-top:14px;">
+              <div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:2px;">iPhone 14 Pro</div>
+              <div style="font-size:13px;color:#6b7280;margin-bottom:10px;">Penukaran Skrin OLED</div>
+              <div class="price-row"><span>Bahagian (1):</span><span>RM 339.00</span></div>
+              <div class="price-row"><span>Upah (0.75j):</span><span>RM 11.00</span></div>
+              <div class="price-total" style="border-top:1px solid #e5e7eb;margin-top:8px;padding-top:8px;"><span>JUMLAH:</span><span style="color:#111827;">RM 350.00</span></div>
+            </div>
+            <div class="section-title">Amaun</div>
+            <div class="input-box" style="margin-bottom:14px;"><span style="font-weight:600;color:#111827;margin-right:4px;">RM</span><span>350.00</span></div>
+            <div class="section-title">Kaedah</div>
+            <div class="card">
+              <div class="payment-method"><div class="method-icon">&#x1F4B5;</div><div class="method-label">Tunai</div><div class="radio-circle"></div></div>
+              <div class="payment-method"><div class="method-icon">&#x1F4F1;</div><div class="method-label">QR Pay</div><div class="radio-circle selected">&#10003;</div></div>
+              <div class="payment-method"><div class="method-icon">&#x1F3E6;</div><div class="method-label">Bank Transfer</div><div class="radio-circle"></div></div>
+            </div>
+            <div class="section-title">Nota</div>
+            <div class="textarea-box" style="margin-bottom:14px;">Nota pembayaran (pilihan)</div>
+            <div class="inventory-preview">
+              <h5>Stok akan dikemaskini:</h5>
+              <div class="inventory-item">Skrin OLED: 5 &rarr; 4</div>
+              <div class="inventory-item">Gam perekat: 12 &rarr; 11</div>
+            </div>
+          </div>
+          <div class="submit-section">
+            <button class="btn btn-primary">SAHKAN BAYARAN & SELESAI</button>
+            <div class="submit-note">Stok akan dikemaskini secara automatik</div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen11">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="profile-screen">
+          <div style="padding:12px 16px;border-bottom:1.5px solid #e5e7eb;background:#f9fafb;"><h2 style="font-size:17px;font-weight:700;color:#111827;">Profil</h2></div>
+          <div class="profile-scroll">
+            <div class="user-card">
+              <div class="avatar">A</div>
+              <div class="user-info"><div class="user-name">Amir</div><div class="user-role">Teknikal</div><div class="user-outlet">Dungun 1</div></div>
+            </div>
+            <div class="settings-list">
+              <div class="settings-row"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><div class="settings-label">Tukar Cawangan</div><div class="settings-value">Dungun 1</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+              <div class="settings-row"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><div class="settings-label">Bahasa</div><div class="settings-value">Bahasa Melayu</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+              <div class="settings-row"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><div class="settings-label">Mod Gelap</div><div class="toggle active"></div></div>
+              <div class="settings-row"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="settings-label">Notifikasi</div><div class="toggle active"></div></div>
+              <div class="settings-row"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M8 11l4 4 4-4"/></svg><div class="settings-label">Log Masuk Biometrik</div><div class="toggle active"></div></div>
+            </div>
+            <div style="text-align:center;margin-bottom:14px;"><div style="font-size:10px;color:#d1d5db;">Versi 1.0.0 (Build 42)</div><div style="font-size:9px;color:#e5e7eb;">Dikuasakan oleh Repair Intake</div></div>
+            <button class="btn btn-destructive">Log Keluar</button>
+          </div>
+          <div class="tab-bar">
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Utama</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 14l2 2 4-4"/></svg><span>Tugas</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.8 2.3A.5.5 0 0 0 4 2.7v18.6a.5.5 0 0 0 .8.4l12-9.3a.5.5 0 0 0 0-.8l-12-9.3Z"/><circle cx="19" cy="12" r="2"/></svg><span>Nilai</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Sejarah</span></div>
+            <div class="tab-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 1-4-4H8a4 4 0 0 1-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen12">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="history-screen">
+          <div class="history-header">
+            <div class="search-bar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Cari tiket, pelanggan, atau peranti</span></div>
+            <div class="filter-chips"><div class="chip active">7 hari</div><div class="chip">30 hari</div><div class="chip">Semua</div><div class="chip">Selesai</div><div class="chip">Dibatalkan</div></div>
+          </div>
+          <div class="date-header">Hari ini</div>
+          <div class="ticket-list" style="padding:0 16px;">
+            <div class="ticket-card"><div class="ticket-card-top"><span class="ticket-id">#D1-038</span><span class="ticket-time">Selesai</span></div><div class="ticket-device">Samsung Galaxy S21</div><div class="ticket-customer">Nur Aisyah</div><div class="ticket-issue">"Penukaran skrin"</div><div class="ticket-card-bottom"><span class="status-badge badge-paid">Dibayar</span><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+          </div>
+          <div class="date-header">Semalam</div>
+          <div class="ticket-list" style="padding:0 16px;">
+            <div class="ticket-card"><div class="ticket-card-top"><span class="ticket-id">#D1-035</span><span class="ticket-time">Diambil</span></div><div class="ticket-device">iPhone 11</div><div class="ticket-customer">Raju a/l Kumar</div><div class="ticket-issue">"Bateri kembung"</div><div class="ticket-card-bottom"><span class="status-badge badge-completed">Siap</span><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+            <div class="ticket-card"><div class="ticket-card-top"><span class="ticket-id">#D1-033</span><span class="ticket-time">Dibatalkan</span></div><div class="ticket-device">iPhone XR</div><div class="ticket-customer">Tan Mei Ling</div><div class="ticket-issue">"Tiada bunyi"</div><div class="ticket-card-bottom"><span class="status-badge badge-cancelled">Dibatalkan</span><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+          </div>
+          <div class="tab-bar">
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Utama</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 14l2 2 4-4"/></svg><span>Tugas</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.8 2.3A.5.5 0 0 0 4 2.7v18.6a.5.5 0 0 0 .8.4l12-9.3a.5.5 0 0 0 0-.8l-12-9.3Z"/><circle cx="19" cy="12" r="2"/></svg><span>Nilai</span></div>
+            <div class="tab-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Sejarah</span></div>
+            <div class="tab-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 1-4-4H8a4 4 0 0 1-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-screen" id="screen13">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="dead-device-screen">
+          <div class="modern-header">
+            <div class="modern-header-left">
+              <button class="header-action-text">Kembali</button>
+            </div>
+            <div class="modern-header-center">
+              <div class="modern-header-title">Penilaian</div>
+              <div class="modern-header-subtitle">#D1-044</div>
+            </div>
+            <div class="modern-header-right"></div>
+          </div>
+          <div class="dead-scroll">
+            <div class="warning-card">
+              <svg class="warning-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <h3>Peranti Tidak Boleh Dihidupkan</h3>
+              <p>Diagnosis tidak boleh dibuat tanpa pemeriksaan fizikal.</p>
+            </div>
+            <div class="section-title">Pilihan</div>
+            <div class="option-card selected">
+              <div class="option-num">1</div>
+              <div class="option-info"><h4>YURAN PEMERIKSAAN: RM29</h4><p>Periksa peranti. Anggaran akan dihantar kemudian.</p></div>
+            </div>
+            <div class="option-card">
+              <div class="option-num">2</div>
+              <div class="option-info"><h4>TUNGGU KELULUSAN</h4><p>Maklumkan pelanggan dulu.</p></div>
+            </div>
+            <button class="btn btn-primary" style="margin-bottom:14px;">SIMPAN SEBAGAI "SEDANG DINILAI"</button>
+            <div class="price-change-warning">
+              <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>PERUBAHAN HARGA BESAR</h4>
+              <div class="price-change-row"><span>Yuran semakan:</span><span>RM 29.00</span></div>
+              <div class="price-change-row"><span>Anggaran baru:</span><span>RM 289.00</span></div>
+              <div class="warn-text">Pelanggan perlu luluskan semula.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen14">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="qr-screen">
+          <div class="qr-header">
+            <div class="qr-ticket-id">Tiket #D1-043</div>
+            <div class="qr-device">iPhone 14 Pro</div>
+            <div class="qr-issue">Penukaran Skrin OLED</div>
+            <span class="status-badge badge-inprogress">Dalam Proses</span>
+          </div>
+          <div class="qr-box"></div>
+          <div class="qr-instruction">Imbas untuk kemaskini<br>WhatsApp &amp; status</div>
+          <div class="qr-outlet">Cawangan: Dungun 1<br>No. 23, Jalan Besar</div>
+          <div class="qr-actions">
+            <button class="btn btn-outline">Buka Tiket</button>
+            <button class="btn btn-primary">Tiket Baharu</button>
+          </div>
+        </div>
+      </div>
+      <div class="phone-screen" id="screen15">
+        <div class="status-bar"><span class="time">9:41</span><div class="icons"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"/></svg><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+        <div class="success-screen">
+          <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div class="success-title">Tiket #D1-042 Dicipta</div>
+          <div class="success-desc">WhatsApp akan dihantar kepada pelanggan</div>
+          <div class="success-card">
+            <div class="success-card-row"><strong>Peranti:</strong> iPhone 14 Pro</div>
+            <div class="success-card-row"><strong>Pelanggan:</strong> Ahmad bin Abdullah</div>
+            <div class="success-card-row"><strong>Cawangan:</strong> Dungun 1</div>
+            <div class="success-card-row"><strong>Telefon:</strong> +6012-345-6789</div>
+          </div>
+          <div class="success-actions">
+            <button class="btn btn-outline">Buka Tiket</button>
+            <button class="btn btn-primary">Tiket Baharu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const navItems = document.querySelectorAll('.nav-item');
+const screens = document.querySelectorAll('.phone-screen');
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.dataset.screen;
+    navItems.forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    screens.forEach(s => s.classList.remove('active'));
+    document.getElementById(target).classList.add('active');
+  });
+});
+
+// Filter chips
+const chips = document.querySelectorAll('#screen3 .chip');
+chips.forEach(chip => {
+  chip.addEventListener('click', () => { chips.forEach(c => c.classList.remove('active')); chip.classList.add('active'); });
+});
+
+// Toggles
+document.querySelectorAll('#screen11 .toggle').forEach(t => {
+  t.addEventListener('click', () => t.classList.toggle('active'));
+});
+
+// Suggestion cards
+document.querySelectorAll('#screen7 .suggestion-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('#screen7 .suggestion-card').forEach(c => { c.classList.remove('selected'); const rc = c.querySelector('.radio-circle'); if(rc){rc.classList.remove('selected');rc.innerHTML='';} });
+    card.classList.add('selected'); const rc = card.querySelector('.radio-circle'); if(rc){rc.classList.add('selected');rc.innerHTML='&#10003;';}
+  });
+});
+
+// ETA options
+document.querySelectorAll('#screen7 .eta-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('#screen7 .eta-option').forEach(o => { const rc = o.querySelector('.radio-circle'); if(rc){rc.classList.remove('selected');rc.innerHTML='';} o.querySelector('.eta-label').style.fontWeight='400'; });
+    const rc = opt.querySelector('.radio-circle'); if(rc){rc.classList.add('selected');rc.innerHTML='&#10003;';} opt.querySelector('.eta-label').style.fontWeight='600';
+  });
+});
+
+// Issue cards
+document.querySelectorAll('#screen8 .issue-card').forEach(card => {
+  card.addEventListener('click', () => { document.querySelectorAll('#screen8 .issue-card').forEach(c => c.classList.remove('selected')); card.classList.add('selected'); });
+});
+
+// Option cards
+document.querySelectorAll('#screen13 .option-card').forEach(card => {
+  card.addEventListener('click', () => { document.querySelectorAll('#screen13 .option-card').forEach(c => c.classList.remove('selected')); card.classList.add('selected'); });
+});
+
+// Payment methods
+document.querySelectorAll('#screen10 .payment-method').forEach(pm => {
+  pm.addEventListener('click', () => {
+    document.querySelectorAll('#screen10 .payment-method').forEach(p => { const rc = p.querySelector('.radio-circle'); if(rc){rc.classList.remove('selected');rc.innerHTML='';} });
+    const rc = pm.querySelector('.radio-circle'); if(rc){rc.classList.add('selected');rc.innerHTML='&#10003;';}
+  });
+});
+</script>
+</body>
+</html>
