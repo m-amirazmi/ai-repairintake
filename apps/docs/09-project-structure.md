@@ -1,5 +1,8 @@
 # Project Structure
 
+> **Revision (June 2025):** Single Next.js app replaces `apps/mobile` (Expo) + `apps/web` (Next.js).
+> See `02b-revised-pwa-plan.md` for rationale.
+
 ## Monorepo Layout
 
 ```
@@ -9,220 +12,223 @@ repair-intake/                          # Monorepo root
 │       └── ci.yml                       # Lint, type-check, build on PR
 │
 ├── apps/
-│   ├── mobile/                          # Expo (React Native)
-│   │   ├── app/
-│   │   │   ├── (auth)/
-│   │   │   │   ├── _layout.tsx          # Auth stack layout
-│   │   │   │   ├── login.tsx            # Login screen
-│   │   │   │   └── forgot-password.tsx  # Forgot password
-│   │   │   │
-│   │   │   ├── (app)/
-│   │   │   │   ├── _layout.tsx          # Main tab navigator
-│   │   │   │   ├── index.tsx            # Home / Queue (Jobs tab)
-│   │   │   │   ├── new-ticket.tsx       # New ticket flow (camera + customer)
-│   │   │   │   ├── ticket/
-│   │   │   │   │   └── [id].tsx         # Ticket detail view
-│   │   │   │   ├── assessment/
-│   │   │   │   │   └── [id].tsx         # Technician assessment screen
-│   │   │   │   ├── history.tsx          # Past tickets (History tab)
-│   │   │   │   └── profile.tsx          # User profile (Profile tab)
-│   │   │   │
-│   │   │   └── _layout.tsx              # Root layout (auth gate)
-│   │   │
-│   │   ├── components/
-│   │   │   ├── CameraCapture.tsx        # Camera viewfinder + capture
-│   │   │   ├── DeviceCard.tsx           # Device info display
-│   │   │   ├── TicketListItem.tsx       # Queue list item
-│   │   │   ├── StatusBadge.tsx          # Status color chip
-│   │   │   ├── AssessmentForm.tsx       # Diagnosis input
-│   │   │   ├── SuggestionChips.tsx      # AI diagnosis suggestion pills
-│   │   │   ├── PartsList.tsx            # Parts selection list
-│   │   │   ├── PriceBreakdown.tsx       # Parts + labor calculator
-│   │   │   ├── TimelineSelector.tsx     # ETA selector
-│   │   │   ├── CustomerForm.tsx         # Customer info input
-│   │   │   ├── ConfirmDialog.tsx        # Reusable confirmation modal
-│   │   │   └── EmptyState.tsx           # Empty queue/list state
-│   │   │
-│   │   ├── hooks/
-│   │   │   ├── useAuth.ts               # Auth session management
-│   │   │   ├── useTickets.ts            # Ticket queries (TanStack Query)
-│   │   │   ├── useDeviceIdentification.ts # AI vision hook
-│   │   │   ├── useDiagnosis.ts           # AI diagnosis hook
-│   │   │   ├── useNotifications.ts       # Real-time updates (Supabase)
-│   │   │   └── useLanguage.ts            # i18n language hook
-│   │   │
-│   │   ├── lib/
-│   │   │   ├── api.ts                   # API client (fetch wrapper + auth)
-│   │   │   ├── ai.ts                    # OpenAI API helpers
-│   │   │   ├── storage.ts               # AsyncStorage / SecureStore
-│   │   │   ├── i18n.ts                  # Translation system
-│   │   │   ├── offline.ts              # Offline queue manager
-│   │   │   └── constants.ts             # App constants
-│   │   │
-│   │   ├── assets/
-│   │   │   ├── images/
-│   │   │   └── fonts/
-│   │   │
-│   │   ├── app.json                     # Expo config
-│   │   ├── eas.json                     # EAS Build config
-│   │   ├── tailwind.config.ts           # NativeWind config
-│   │   └── package.json
-│   │
-│   └── web/                             # Next.js (Admin Dashboard + API)
+│   └── web/                             # Single Next.js application
 │       ├── app/
-│       │   ├── (auth)/
-│       │   │   ├── login/
-│       │   │   │   └── page.tsx         # Login page
-│       │   │   └── layout.tsx           # Auth layout
+│       │   ├── (auth)/                  # Auth pages (minimal layout)
+│       │   │   ├── layout.tsx           # Auth layout (centered card, no nav)
+│       │   │   ├── login/page.tsx       # Email + password login
+│       │   │   └── forgot-password/page.tsx
 │       │   │
-│       │   ├── (dashboard)/
-│       │   │   ├── layout.tsx           # Dashboard layout (sidebar + header)
-│       │   │   ├── page.tsx             # Overview (redirect to /overview)
-│       │   │   ├── overview/
-│       │   │   │   └── page.tsx         # Owner dashboard home
+│       │   ├── (app)/                   # Staff PWA (mobile-first, bottom tab nav)
+│       │   │   ├── layout.tsx           # Tab bar (Queue | New | History | Profile)
+│       │   │   ├── page.tsx             # Queue / Home (live ticket list)
+│       │   │   ├── new/
+│       │   │   │   ├── page.tsx         # Intake type picker (3 tiers)
+│       │   │   │   ├── quick/page.tsx   # Quick Repair (<10s)
+│       │   │   │   ├── voice/page.tsx   # Voice Intake (<5s)
+│       │   │   │   └── full/page.tsx    # Full AI Intake (30-90s)
+│       │   │   ├── ticket/
+│       │   │   │   └── [id]/page.tsx    # Ticket detail view
+│       │   │   ├── assessment/
+│       │   │   │   └── [id]/page.tsx    # Technician assessment screen
+│       │   │   ├── payment/
+│       │   │   │   └── [id]/page.tsx    # Payment + receipt screen
+│       │   │   ├── history/page.tsx     # Past tickets (scrollable)
+│       │   │   └── profile/page.tsx     # User profile + settings
+│       │   │
+│       │   ├── (dashboard)/             # Admin dashboard (desktop, sidebar nav)
+│       │   │   ├── layout.tsx           # Sidebar + header layout
+│       │   │   ├── page.tsx             # Redirect to /overview
+│       │   │   ├── overview/page.tsx    # Owner dashboard home
 │       │   │   ├── tickets/
-│       │   │   │   ├── page.tsx         # All tickets list
-│       │   │   │   └── [id]/
-│       │   │   │       └── page.tsx     # Ticket detail view
+│       │   │   │   ├── page.tsx         # All tickets + filters + search
+│       │   │   │   └── [id]/page.tsx    # Ticket detail
 │       │   │   ├── devices/
-│       │   │   │   ├── page.tsx         # Device catalog
-│       │   │   │   └── [id]/
-│       │   │   │       └── page.tsx     # Device edit
-│       │   │   ├── issues/
-│       │   │   │   └── page.tsx         # Issue types
+│       │   │   │   ├── page.tsx         # Device catalog (table)
+│       │   │   │   └── [id]/page.tsx    # Device edit form
+│       │   │   ├── issues/page.tsx      # Issue types management
 │       │   │   ├── parts/
-│       │   │   │   ├── page.tsx         # Parts catalog
-│       │   │   │   └── [id]/
-│       │   │   │       └── page.tsx     # Part edit
+│       │   │   │   ├── page.tsx         # Parts catalog (table)
+│       │   │   │   └── [id]/page.tsx    # Part edit form
 │       │   │   ├── outlets/
 │       │   │   │   ├── page.tsx         # Outlet list
-│       │   │   │   └── [id]/
-│       │   │   │       └── page.tsx     # Outlet detail + staff
+│       │   │   │   └── [id]/page.tsx    # Outlet detail + staff
 │       │   │   ├── staff/
 │       │   │   │   ├── page.tsx         # Staff list
-│       │   │   │   └── [id]/
-│       │   │   │       └── page.tsx     # Staff detail
-│       │   │   ├── reports/
-│       │   │   │   └── page.tsx         # Reports hub
-│       │   │   ├── settings/
-│       │   │   │   └── page.tsx         # Tenant settings
-│       │   │   └── help/
-│       │   │       └── page.tsx         # Help / documentation
+│       │   │   │   └── [id]/page.tsx    # Staff detail + edit
+│       │   │   ├── reports/page.tsx     # Reports hub
+│       │   │   └── settings/page.tsx    # Tenant settings
+│       │   │
+│       │   ├── t/
+│       │   │   └── [token]/page.tsx     # Public ticket view (no auth)
 │       │   │
 │       │   ├── api/                     # Next.js Route Handlers (backend)
-│       │   │   ├── auth/
-│       │   │   │   └── session/
-│       │   │   │       └── route.ts     # GET /api/auth/session
+│       │   │   ├── auth/session/route.ts     # GET current session
 │       │   │   ├── tickets/
-│       │   │   │   ├── route.ts         # GET + POST /api/tickets
+│       │   │   │   ├── route.ts              # GET + POST /api/tickets
+│       │   │   │   ├── quick/route.ts        # POST quick repair ticket
+│       │   │   │   ├── voice/route.ts        # POST voice intake ticket
 │       │   │   │   └── [id]/
-│       │   │   │       ├── route.ts     # GET /api/tickets/:id
-│       │   │   │       ├── assess.ts    # PATCH /api/tickets/:id/assess
-│       │   │   │       ├── status.ts    # PATCH /api/tickets/:id/status
-│       │   │   │       └── approve.ts   # PATCH /api/tickets/:id/approve
+│       │   │   │       ├── route.ts          # GET + PATCH ticket
+│       │   │   │       ├── assess/route.ts   # PATCH assessment
+│       │   │   │       ├── status/route.ts   # PATCH status transition
+│       │   │   │       ├── approve/route.ts  # PATCH customer approval
+│       │   │   │       └── payment/route.ts  # POST payment
 │       │   │   ├── ai/
-│       │   │   │   ├── identify-device/
-│       │   │   │   │   └── route.ts     # POST /api/ai/identify-device
-│       │   │   │   ├── suggest-diagnosis/
-│       │   │   │   │   └── route.ts     # POST /api/ai/suggest-diagnosis
-│       │   │   │   └── transcribe/
-│       │   │   │       └── route.ts     # POST /api/ai/transcribe
-│       │   │   ├── webhooks/
-│       │   │   │   └── whatsapp/
-│       │   │   │       └── route.ts     # POST /api/webhooks/whatsapp
-│       │   │   ├── notifications/
-│       │   │   │   └── send/
-│       │   │   │       └── route.ts     # POST /api/notifications/send
+│       │   │   │   ├── identify-device/route.ts
+│       │   │   │   ├── parse-voice-intake/route.ts
+│       │   │   │   ├── suggest-diagnosis/route.ts
+│       │   │   │   ├── transcribe/route.ts
+│       │   │   │   └── draft-whatsapp/route.ts
+│       │   │   ├── webhooks/whatsapp/route.ts
+│       │   │   ├── notifications/send/route.ts
 │       │   │   └── admin/
-│       │   │       ├── overview/
-│       │   │       │   └── route.ts     # GET /api/admin/overview
-│       │   │       ├── reports/
-│       │   │       │   └── route.ts     # GET /api/admin/reports
-│       │   │       ├── devices/
-│       │   │       │   └── route.ts     # CRUD /api/admin/devices
-│       │   │       ├── issues/
-│       │   │       │   └── route.ts     # CRUD /api/admin/issues
-│       │   │       ├── parts/
-│       │   │       │   └── route.ts     # CRUD /api/admin/parts
-│       │   │       └── users/
-│       │   │           └── route.ts     # CRUD /api/admin/users
+│       │   │       ├── overview/route.ts
+│       │   │       ├── reports/route.ts
+│       │   │       ├── devices/route.ts
+│       │   │       ├── issues/route.ts
+│       │   │       ├── parts/route.ts
+│       │   │       └── users/route.ts
 │       │   │
-│       │   └── layout.tsx               # Root layout
+│       │   ├── manifest.ts             # PWA manifest (next/metadata)
+│       │   └── layout.tsx              # Root layout (providers, theme, fonts)
 │       │
 │       ├── components/
-│       │   ├── DashboardShell.tsx        # Sidebar + header layout
-│       │   ├── StatCard.tsx              # Metric cards
-│       │   ├── TicketTable.tsx           # Data table for tickets
-│       │   ├── DeviceForm.tsx            # Add/edit device form
-│       │   ├── PartForm.tsx              # Add/edit part form
-│       │   ├── StaffForm.tsx             # Add/edit staff form
-│       │   ├── StatusBadge.tsx           # Status color chip
-│       │   ├── PriceCalculator.tsx       # Parts + labor calculator
-│       │   └── ReportChart.tsx           # Recharts wrappers
+│       │   ├── staff/                   # Staff PWA components
+│       │   │   ├── TabBar.tsx           # Bottom tab navigation
+│       │   │   ├── QueueList.tsx        # Live ticket queue
+│       │   │   ├── TicketCard.tsx       # Queue item (~80px compact, swipe)
+│       │   │   ├── CameraCapture.tsx    # getUserMedia / input capture
+│       │   │   ├── VoiceRecorder.tsx    # MediaRecorder mic button
+│       │   │   ├── DeviceTypeahead.tsx  # Quick Repair device search
+│       │   │   ├── IssueSelector.tsx    # Quick-select issue chips
+│       │   │   ├── PriceCard.tsx        # Auto-filled price display
+│       │   │   ├── QualityGate.tsx      # Photo quality check overlay
+│       │   │   ├── DamageOverlay.tsx    # AI damage annotations on photo
+│       │   │   ├── StatusBadge.tsx      # Status color pill
+│       │   │   ├── AssessmentForm.tsx   # Diagnosis + parts + pricing
+│       │   │   ├── SuggestionChips.tsx  # AI diagnosis suggestion pills
+│       │   │   ├── PartsPicker.tsx      # Parts multi-select
+│       │   │   ├── PriceBreakdown.tsx   # Parts + labor calculator
+│       │   │   ├── PaymentForm.tsx      # Payment method + amount
+│       │   │   ├── QRReceipt.tsx        # QR code + public link display
+│       │   │   ├── CustomerForm.tsx     # Name + phone input (Full AI)
+│       │   │   ├── OfflineBanner.tsx    # Offline indicator banner
+│       │   │   ├── EmptyState.tsx       # Empty queue/list placeholder
+│       │   │   └── ConfirmDialog.tsx    # Reusable confirmation modal
+│       │   │
+│       │   ├── dashboard/               # Admin dashboard components
+│       │   │   ├── DashboardShell.tsx   # Sidebar + header layout
+│       │   │   ├── Sidebar.tsx          # Navigation sidebar
+│       │   │   ├── Header.tsx           # Top bar (breadcrumb + user menu)
+│       │   │   ├── StatCard.tsx         # Metric card (icon + value + trend)
+│       │   │   ├── TicketTable.tsx      # Data table with filters
+│       │   │   ├── DeviceForm.tsx       # Add/edit device
+│       │   │   ├── PartForm.tsx         # Add/edit part
+│       │   │   ├── StaffForm.tsx        # Add/edit staff
+│       │   │   └── ReportChart.tsx      # Recharts wrapper
+│       │   │
+│       │   └── shared/                  # Shared UI primitives
+│       │       ├── Button.tsx
+│       │       ├── Input.tsx
+│       │       ├── Card.tsx
+│       │       ├── Toast.tsx
+│       │       └── Icons.tsx            # Lucide icon wrappers
 │       │
 │       ├── hooks/
-│       │   ├── useAuth.ts               # Auth session
-│       │   ├── useTickets.ts             # Ticket queries
-│       │   ├── useDashboard.ts           # Overview metrics
-│       │   └── useReports.ts             # Report data
+│       │   ├── useAuth.ts              # Supabase session + WebAuthn
+│       │   ├── useTickets.ts           # TanStack Query hooks
+│       │   ├── useTicket.ts            # Single ticket query
+│       │   ├── useRealtime.ts          # Supabase Realtime subscription
+│       │   ├── useCamera.ts            # getUserMedia hook
+│       │   ├── useVoiceRecorder.ts     # MediaRecorder hook
+│       │   ├── useDeviceSearch.ts      # Typeahead search hook
+│       │   ├── useIssueQuickSelect.ts  # Top-10 issues per device
+│       │   ├── useOffline.ts           # Online status + sync queue
+│       │   ├── useBiometrics.ts        # WebAuthn credential management
+│       │   ├── useLanguage.ts          # ms/en switching
+│       │   ├── useDashboard.ts         # Overview metrics
+│       │   └── useReports.ts           # Report data
 │       │
 │       ├── lib/
-│       │   ├── api.ts                   # API client
-│       │   ├── auth.ts                  # Auth helpers
-│       │   ├── db.ts                    # Drizzle ORM client
-│       │   └── utils.ts                 # General utilities
+│       │   ├── db.ts                   # Drizzle ORM client + schema
+│       │   ├── auth.ts                 # Supabase auth helpers + middleware
+│       │   ├── api.ts                  # Client-side fetch wrapper (+ auth)
+│       │   ├── ai.ts                   # OpenAI client (GPT-4o, Whisper)
+│       │   ├── whatsapp.ts             # 360dialog client
+│       │   ├── offline.ts              # IndexedDB queue manager
+│       │   ├── sw.ts                   # Service worker registration
+│       │   ├── i18n.ts                 # Translation system (ms/en)
+│       │   ├── constants.ts            # App constants
+│       │   └── utils.ts                # Formatters, cn(), etc.
 │       │
+│       ├── public/
+│       │   ├── sw.js                   # Service worker (auto-generated)
+│       │   ├── workbox-*.js            # Workbox runtime
+│       │   ├── icons/
+│       │   │   ├── icon-192.png        # PWA icon small
+│       │   │   └── icon-512.png        # PWA icon large
+│       │   ├── screenshots/
+│       │   │   ├── queue.png           # PWA install screenshot
+│       │   │   └── new-ticket.png      # PWA install screenshot
+│       │   └── favicon.ico
+│       │
+│       ├── next.config.ts              # PWA plugin + config
+│       ├── tailwind.config.ts          # Tailwind v4 + design tokens
 │       └── package.json
 │
 ├── packages/
-│   ├── shared/                          # Shared code between apps
-│   │   ├── types/
-│   │   │   ├── database.ts              # Zod schemas for all tables
-│   │   │   ├── api.ts                   # API request/response types
-│   │   │   ├── ticket.ts                # Ticket state machine types
-│   │   │   └── index.ts                 # Barrel export
-│   │   ├── constants/
-│   │   │   ├── devices.ts               # Seed device data (50 models)
-│   │   │   ├── issues.ts                # Common issues (9 types)
-│   │   │   └── index.ts                 # Barrel export
-│   │   ├── utils/
-│   │   │   ├── formatters.ts            # Price/date/money formatters
-│   │   │   ├── validators.ts            # Shared Zod validators
-│   │   │   └── index.ts                 # Barrel export
-│   │   └── package.json
-│   │
-│   └── ui/                              # Shared UI primitives (optional)
-│       ├── components/
-│       │   ├── Button.tsx
-│       │   ├── Input.tsx
-│       │   └── Card.tsx
+│   └── shared/                         # Shared code
+│       ├── types/
+│       │   ├── database.ts             # Zod schemas for all tables
+│       │   ├── api.ts                  # API request/response types
+│       │   ├── ticket.ts               # Ticket state machine types
+│       │   └── index.ts                # Barrel export
+│       ├── constants/
+│       │   ├── devices.ts              # Seed device data (50 models)
+│       │   ├── issues.ts               # Common issues (9 types)
+│       │   └── index.ts                # Barrel export
+│       ├── utils/
+│       │   ├── formatters.ts           # Price/date/money formatters
+│       │   ├── validators.ts           # Shared Zod validators
+│       │   └── index.ts                # Barrel export
 │       └── package.json
 │
 ├── supabase/
-│   ├── migrations/                      # Drizzle or Supabase migrations
-│   │   ├── 0000_initial.sql             # Initial schema
-│   │   ├── 0001_add_outlets.sql         # Outlets migration
-│   │   ├── 0002_add_notifications.sql   # Notifications migration
+│   ├── migrations/
+│   │   ├── 0000_initial.sql            # Initial schema
+│   │   ├── 0001_seed_devices.sql       # Device catalog seed
 │   │   └── ...
-│   └── seed.sql                         # Seed data for development
+│   └── seed.sql                        # Development seed data
 │
-├── turbo.json                           # Turborepo configuration
-├── package.json                         # Root workspace config
-├── pnpm-workspace.yaml                  # pnpm workspace definition
-├── .env.example                         # Environment variables template
-└── README.md                            # Project README
+├── turbo.json                          # Turborepo configuration
+├── package.json                        # Root workspace config
+├── pnpm-workspace.yaml                 # pnpm workspace definition
+├── .env.example                        # Environment variables template
+└── README.md                           # Project README
 ```
+
+## Route Group Strategy
+
+Three route groups in a single Next.js app, each with its own layout:
+
+| Route Group | Path | Layout | Auth | Users |
+|---|---|---|---|---|
+| `(auth)` | `/login`, `/forgot-password` | Centered card, no nav | None | Unauthenticated |
+| `(app)` | `/`, `/new/*`, `/ticket/*`, `/assessment/*`, `/history`, `/profile` | Bottom tab bar, mobile-first | Required (all roles) | Staff (front desk, technician) |
+| `(dashboard)` | `/overview`, `/tickets`, `/devices`, `/parts`, `/outlets`, `/staff`, `/reports`, `/settings` | Sidebar + header, desktop | Required (owner, manager) | Owner, manager |
+| Public | `/t/[token]` | Minimal, no nav | None | Customers (via QR link) |
 
 ## Naming Conventions
 
 | Convention | Example |
 |---|---|
-| Tables | `snake_case`: `repair_tickets`, `device_issues` |
-| Columns | `snake_case`: `customer_id`, `created_at` |
-| TypeScript types | `PascalCase`: `Ticket`, `Customer` |
+| Tables | `snake_case`: `tickets`, `device_quick_issues`, `notifications` |
+| Columns | `snake_case`: `customer_id`, `created_at`, `intake_type` |
+| TypeScript types | `PascalCase`: `Ticket`, `Customer`, `IntakeType` |
 | API routes | `kebab-case`: `/api/ai/identify-device` |
-| React components | `PascalCase`: `TicketListItem`, `CameraCapture` |
-| Hooks | `use` prefix: `useTickets`, `useAuth` |
+| React components | `PascalCase`: `TicketCard`, `CameraCapture` |
+| Hooks | `use` prefix: `useTickets`, `useAuth`, `useOffline` |
 | Files (components) | `PascalCase.tsx`: `StatusBadge.tsx` |
 | Files (utilities) | `camelCase.ts`: `formatters.ts` |
 
@@ -232,17 +238,15 @@ repair-intake/                          # Monorepo root
 {
   "scripts": {
     "dev": "turbo dev",
-    "dev:mobile": "turbo dev --filter mobile",
     "dev:web": "turbo dev --filter web",
     "build": "turbo build",
-    "build:mobile": "turbo build --filter mobile",
     "build:web": "turbo build --filter web",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
-    "db:generate": "turbo db:generate",
-    "db:migrate": "turbo db:migrate",
-    "db:seed": "turbo db:seed",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx supabase/seed.ts",
     "clean": "turbo clean && rm -rf node_modules"
   }
 }

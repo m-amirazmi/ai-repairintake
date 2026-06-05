@@ -69,7 +69,7 @@ For known fixes, they jump straight to Quick Repair or Voice Intake.
 - **Intake**: Three-tier graduated intake (Voice, Quick Repair, Full AI)
 - **Flow**: Receive → Assess → Quote → Approve → Repair → Pay → Notify → Pickup
 - **POS Replacement**: Payment capture, receipt generation, parts inventory decrement
-- **Platforms**: Expo React Native (iOS + Android) + Web admin dashboard (Next.js) + Public ticket view (lightweight web)
+- **Platforms**: Single Next.js PWA (mobile-first responsive) — serves staff app, admin dashboard, and public ticket view. No Expo / React Native. Staff use via mobile browser with "Add to Home Screen."
 - **Communication**: WhatsApp Business API (centralized HQ number)
 - **Language**: Bahasa Melayu (default) + English
 - **Multi-Outlet**: 5 branches, shared pricing catalog
@@ -103,7 +103,7 @@ For known fixes, they jump straight to Quick Repair or Voice Intake.
 | Static parts catalog                         | Each shop uses different suppliers — owner manages their own pricing                                                        |
 | Single WhatsApp number                       | Centralized HQ communication for all 5 outlets                                                                              |
 | One codebase for all roles                   | Role-based UI, not separate apps for front-desk vs technician                                                               |
-| Mobile-first (iOS focus, Android compatible) | Staff currently use iPhones. App built on Expo — runs on Android too. iOS gets first-class testing and polish.              |
+| PWA over native app | Solo frontend web dev — PWA ships in weeks, not months. Staff use the app as a work tool (9am-6pm), not a consumer app. Add to Home Screen = indistinguishable from native for this use case. |
 | Voice-to-structured notes                    | Faster than typing; extracts structured data from speech                                                                    |
 | AI damage documentation                      | Protects shop from "you broke my phone" disputes                                                                            |
 | AI WhatsApp drafting                         | Consistent professional tone across all 5 outlets                                                                           |

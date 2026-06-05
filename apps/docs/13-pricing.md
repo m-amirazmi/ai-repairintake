@@ -16,22 +16,20 @@ During the 6-month build, all infrastructure and API costs are absorbed by you a
 
 | Service | Monthly Cost (RM) | Notes |
 |---------|------------------|-------|
-| Apple Developer Program | RM38 | RM450/year amortized |
 | Domain + DNS | RM4 | RM50/year amortized |
 | Supabase Cloud | RM0 | Free tier (500MB DB, 1GB storage) |
 | OpenAI API (dev + testing) | RM50–100 | GPT-4o Vision + GPT-4o calls |
 | 360dialog WhatsApp API | RM0–30 | Sandbox → low volume production |
 | Vercel Hosting | RM0 | Hobby tier |
-| Expo EAS Build | RM0 | Free tier |
-| **Total Monthly (POC)** | **~RM90–170** | |
+| **Total Monthly (POC)** | **~RM55–135** | |
 
 ### 6-Month POC Total Cash Outlay
 
 | Category | Amount (RM) |
 |----------|-------------|
-| One-time (Apple Dev, domain, initial credits) | ~RM750 |
-| Monthly costs × 6 months | ~RM600–1,020 |
-| **Total POC Investment** | **~RM1,350–1,770** |
+| One-time (domain, initial API credits) | ~RM200 |
+| Monthly costs × 6 months | ~RM330–810 |
+| **Total POC Investment** | **~RM530–1,010** |
 
 Your sweat equity (6 months full-time development) is the real investment — valued at RM30,000–60,000 of market-rate engineering time.
 
@@ -39,27 +37,31 @@ Your sweat equity (6 months full-time development) is the real investment — va
 
 ## When to Start Charging
 
-### Brother's Shops: Month 4+ (Post-MVP)
+### Brother's Shops: 6-Month Free Trial
 
-Once the system is handling real tickets daily and saving staff time, transition to a fair operational cost recovery:
+Rather than incremental cost-sharing, brother gets a clean **6-month free trial** for the first 3 outlets. The goal: let the system prove itself as their main tool for repair tracking and WhatsApp customer communication before asking for payment.
 
 | Milestone | Action |
 |-----------|--------|
-| **Month 1–3** | Free. Focus on adoption and feedback. |
-| **Month 4** | Introduce "cost sharing": Brother covers WhatsApp API + Supabase Pro (~RM300/month). You continue covering AI costs. |
-| **Month 5** | Full operational cost split: Brother covers all infra costs (~RM435/month). You cover nothing. |
-| **Month 6** | Negotiate license fee: RM200–500/outlet/month for software + AI. This is your first revenue. |
+| **Month 1–3** | Build MVP. Brother's shops not onboarded yet. |
+| **Month 4–6** | Pilot phase: 3 outlets fully onboarded, all features, zero cost to brother. |
+| **Month 7–9** | Full rollout: remaining 2 outlets join. Still free. Monitor usage and dependency. |
+| **Month 10** | Evaluation: is this their main system for repair tracking + WhatsApp communication? If yes → negotiate paid license. If no → extend trial 3 more months and fix gaps. |
 
-**Suggested brother pricing (Month 6):**
-- RM300/outlet/month = RM1,500/month for 5 outlets
-- Includes: software license, all AI features, WhatsApp messaging, support
-- 12-month minimum contract
-- Annual prepay: 10% discount (RM16,200/year)
+**Success criteria before charging:**
+- System is their primary tool for ticket creation (not paper/WhatsApp manually)
+- WhatsApp customer notifications are flowing through the platform
+- Staff at all outlets are using it daily without hand-holding
+- Queue management and payment capture are happening in-app
 
-This is reasonable because:
-- Each outlet handles ~300 tickets/month
-- Cost per ticket: RM1.00 (vs. saving 5+ minutes staff time per ticket)
-- Competing software (non-AI) in Malaysia charges RM500–800/outlet/month
+**Post-evaluation pricing (Month 10+):**
+- RM250/outlet/month for the first 3 outlets = RM750/month
+- Remaining 2 outlets at same rate = RM1,250/month total for all 5
+- Grandfathered at this rate for 24 months from first payment
+- No setup fee, no contract minimum
+- Annual prepay: 10% discount
+
+This is substantially below the public rate (RM300/outlet on Basic plan) in exchange for being the reference customer and providing ongoing feedback.
 
 ---
 
@@ -83,7 +85,7 @@ When extracting into a multi-tenant SaaS for other repair shops.
 
 ### What's Included (All Plans)
 
-- Unlimited tickets
+- Generous monthly ticket allowance (see limits below)
 - AI device identification (Vision)
 - AI diagnosis suggestions
 - Photo quality gate
@@ -91,10 +93,10 @@ When extracting into a multi-tenant SaaS for other repair shops.
 - Voice-to-structured notes
 - WhatsApp Business API integration
 - Bahasa Melayu + English
-- iOS mobile app
-- Web admin dashboard
+- Web PWA (mobile + desktop)
 - Real-time queue
 - Basic reporting
+- Staff accounts (up to plan limit)
 
 ### Add-Ons
 
@@ -122,12 +124,12 @@ When extracting into a multi-tenant SaaS for other repair shops.
 
 - **Starter at RM199**: Lower than most POS systems (RM300–500), competitive with simple ticket apps
 - **Per-outlet model**: Aligns with how repair shops think ("I have 3 branches")
-- **No per-ticket fees**: Predictable monthly cost, no surprise bills during busy months
+- **Fair-use ticket limits**: Predictable infrastructure costs, no surprise bills. 500+ tickets/mo is generous for a single-outlet shop (covers 16+ repairs/day).
 - **AI included**: Differentiator — competitors charge extra for "premium features"
 
 ### Competitor Comparison (Malaysia Market)
 
-| Product | Price | AI? | WhatsApp? | Mobile App? |
+| Product | Price | AI? | WhatsApp? | Mobile PWA? |
 |---------|-------|-----|-----------|-------------|
 | Simple ticket book (manual) | RM0 | No | No | No |
 | Google Sheets / Excel | RM0 | No | No | No |
@@ -143,44 +145,56 @@ When extracting into a multi-tenant SaaS for other repair shops.
 
 | Month | Shops | Outlets | MRR (RM) | Notes |
 |-------|-------|---------|----------|-------|
-| 6 | 1 (brother) | 5 | 1,500 | Brother paying full license |
-| 7 | 3 | 8 | 2,500 | 2 friendly shops on trial |
-| 8 | 5 | 12 | 3,800 | First paid conversions |
-| 9 | 8 | 18 | 5,500 | Word of mouth in repair community |
-| 10 | 12 | 25 | 7,500 | |
-| 11 | 15 | 30 | 9,000 | |
-| 12 | 20 | 40 | 12,000 | |
+| 6 | 0 | 0 | 0 | 2–3 friendly shops on free trial |
+| 7 | 2 | 4 | 800 | First external paid conversions |
+| 8 | 4 | 8 | 2,000 | Word of mouth in repair community |
+| 9 | 6 | 12 | 3,200 | |
+| 10 | 1 (brother) + 8 | 3 + 16 | 6,400 | Brother evaluation complete, 3 outlets paid |
+| 11 | 1 + 12 | 3 + 25 | 8,750 | |
+| 12 | 1 + 18 | 3 + 35 | 12,000 | Brother adds 2 more outlets |
 
-**Year 1 Total Revenue: ~RM55,000**
+**Year 1 Total Revenue: ~RM33,000** (lower due to brother's extended free trial)
 
 ### Moderate Scenario (Year 1)
 
 | Month | Shops | Outlets | MRR (RM) |
 |-------|-------|---------|----------|
-| 6 | 1 | 5 | 1,500 |
-| 7 | 5 | 10 | 3,500 |
-| 8 | 10 | 20 | 7,000 |
-| 9 | 18 | 35 | 12,000 |
-| 10 | 25 | 50 | 17,000 |
-| 11 | 35 | 70 | 23,000 |
-| 12 | 50 | 100 | 32,000 |
+| 6 | 0 | 0 | 0 |
+| 7 | 5 | 10 | 2,500 |
+| 8 | 10 | 20 | 5,000 |
+| 9 | 18 | 35 | 10,000 |
+| 10 | 1 (brother) + 25 | 3 + 50 | 15,750 |
+| 11 | 1 + 35 | 5 + 70 | 23,500 |
+| 12 | 1 + 50 | 5 + 100 | 33,000 |
 
-**Year 1 Total Revenue: ~RM140,000**
+**Year 1 Total Revenue: ~RM90,000**
 
-### Costs at Scale (50 shops, 100 outlets)
+### Costs at Scale (50 shops, ~100 outlets)
 
-| Service | Monthly Cost (RM) |
-|---------|------------------|
-| Supabase (scaled) | 1,500 |
-| OpenAI API (all tenants) | 3,000 |
-| 360dialog WhatsApp | 4,000 |
-| Vercel (Pro) | 400 |
-| Expo EAS (Teams) | 300 |
-| Stripe fees (3.4% + RM1) | 1,100 |
-| Customer support (part-time) | 2,000 |
-| **Total Monthly Costs** | **~RM12,300** |
-| **MRR (RM32,000)** | |
-| **Gross Margin** | **~62%** |
+| Service | Monthly Cost (RM) | Notes |
+|---------|------------------|-------|
+| Supabase (scaled) | 1,500 | Pro/Team tier |
+| OpenAI API (all tenants) | 500 | ~30K tickets/mo, 60% Quick Repair (free), 25% Voice (RM0.03), 15% Full AI (RM0.06) |
+| 360dialog WhatsApp | 4,000 | ~30K conversations/mo |
+| Vercel (Pro) | 90 | $20/mo Pro tier |
+| Stripe fees (3.4%) | 1,120 | On ~RM33K MRR |
+| Customer support (part-time) | 2,000 | |
+| **Total Monthly Costs** | **~RM9,210** | |
+| **MRR (RM33,000)** | |
+| **Gross Margin** | **~72%** | |
+
+### Breakeven Analysis
+
+At small scale, infra costs are negligible (free tiers, founder support):
+
+| Stage | Shops | MRR | Infra Costs | Margin |
+|-------|-------|-----|-------------|--------|
+| **Minimal** (2 shops on Basic) | 2 | RM798 | ~RM300 | **62%** |
+| **Breakeven** | 2–3 | RM1,197 | ~RM500 | **58%** |
+| **Healthy** (10 shops) | 10 | RM4,500 | ~RM1,500 | **67%** |
+| **Scale** (50 shops) | 50 | RM33,000 | ~RM9,210 | **72%** |
+
+Breakeven happens almost immediately — at just **2–3 shops on Basic plan**, monthly subscription revenue already covers all infrastructure costs. The real investment is engineering time, not infrastructure.
 
 ---
 
@@ -189,15 +203,16 @@ When extracting into a multi-tenant SaaS for other repair shops.
 | Phase | Timeline | Brother Pays | Other Shops | Your Focus |
 |-------|----------|--------------|-------------|------------|
 | **Build** | Month 1–3 | Nothing | N/A | Build MVP |
-| **Pilot** | Month 4–5 | Infra costs only (~RM300/mo) | N/A | Polish, fix bugs |
-| **License** | Month 6 | RM1,500/mo | N/A | Extract SaaS |
-| **Beta** | Month 6–7 | RM1,500/mo | 2–3 free trials | Onboarding |
-| **Launch** | Month 8+ | RM1,500/mo | First paid customers | Growth |
+| **Pilot** | Month 4–6 | Nothing (3 outlets free) | N/A | Polish, fix bugs, measure adoption |
+| **Full Rollout** | Month 7–9 | Nothing (all 5 outlets free) | 2–3 free trials | Monitor dependency, collect testimonials |
+| **Evaluate** | Month 10 | Revenue starts if criteria met | Begin paid conversions | Negotiate license, extract SaaS |
+| **Launch** | Month 10+ | RM250/outlet/mo (3 outlets) | First paid customers | Growth |
 
 ### Brother's Pricing Guarantee
 
-As the first customer and investor (through shop adoption), brother gets:
-- **Grandfathered pricing**: RM250/outlet/month locked for 24 months (vs. RM300 public rate)
+As the first customer and real-world testing ground, brother gets:
+- **6 months free**: 3+ outlets fully featured, zero cost, no strings
+- **Grandfathered pricing**: RM250/outlet/month locked for 24 months (vs. RM300+ public rate)
 - **Feature priority**: His shop needs get first priority in development
 - **Zero setup fee**: Waived RM500 onboarding fee
 - **Free white-label**: RM199/month add-on included free
@@ -221,7 +236,7 @@ As the first customer and investor (through shop adoption), brother gets:
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Brother refuses to pay Month 6 | High | Written agreement Month 1; "free for 5 months, then license" |
+| Brother doesn't adopt system as main tool | High | 6-month free trial with clear success criteria; system must integrate deeply into daily workflow |
 | Shops prefer free alternatives | Medium | AI differentiation; 10x better than spreadsheets |
 | Price sensitivity in Malaysia | Medium | Offer monthly; annual discount; starter plan at RM199 |
 | OpenAI costs rise | Low | Implement rate limiting; cache results; swap models |
@@ -231,11 +246,12 @@ As the first customer and investor (through shop adoption), brother gets:
 
 ## Summary
 
-- **POC is free for brother** (you invest ~RM1,500 + 6 months time)
-- **Month 6**: Brother starts paying RM1,500/mo for 5 outlets
-- **SaaS pricing**: RM199–799/month per shop, AI included
-- **Year 1 target**: RM55,000–140,000 revenue from 20–50 shops
-- **Gross margin target**: 60%+ at scale
-- **Breakeven**: ~15 shops on Pro plan (RM12,000 MRR = ~RM12,300 costs)
+- **POC is free for brother** (you invest ~RM530–1,010 cash + 6 months time)
+- **6-month free trial**: 3+ outlets, all features, zero cost to brother
+- **Month 10**: Brother starts paying RM250/outlet/month if system is their main tool
+- **SaaS pricing**: RM199–799/month per shop, AI included, fair-use ticket limits
+- **Year 1 target**: RM33,000–90,000 revenue from 18–50 shops (lower due to brother free trial)
+- **Gross margin target**: 72% at scale (corrected from inflated AI + infra estimates)
+- **Breakeven**: ~2–3 shops — infra costs are minimal at small scale
 
 The AI features are not just product differentiators — they justify the price premium over manual systems. A shop paying RM399/month saves 10+ staff-hours, which at Malaysian wages is worth RM300–500/month. The ROI is immediate.

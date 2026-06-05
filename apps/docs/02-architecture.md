@@ -1,55 +1,93 @@
 # System Architecture
 
+> **Revision (June 2025):** Single Next.js PWA replaces Expo + Next.js. See `02b-revised-pwa-plan.md` for full rationale and revised plan.
+
 ## High-Level Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              CLIENT LAYER                                   │
-│  ┌──────────────────────┐  ┌──────────────────────┐  ┌────────────────────┐ │
-│  │   MOBILE APP         │  │   ADMIN DASHBOARD    │  │   CUSTOMER WEB     │ │
-│  │   (Expo / iOS)       │  │   (Next.js / Web)    │  │   (Lightweight)    │ │
-│  │                      │  │                      │  │                    │ │
-│  │  Front desk staff    │  │  Owner/Manager       │  │  View quote        │ │
-│  │  Technicians         │  │  Reports             │  │  Approve/Reject    │ │
-│  │  Queue view          │  │  Catalog management  │  │                    │ │
-│  │  Assessment          │  │  Staff management    │  │                    │ │
-│  └──────────┬───────────┘  └──────────┬───────────┘  └──────────┬─────────┘ │
-│             │                         │                         │           │
-│             └─────────────┬───────────┴─────────────────────────┘           │
-│                           │                                                 │
-│                    ┌──────┴──────┐                                          │
-│                    │  API LAYER  │                                          │
-│                    │  Next.js    │                                          │
-│                    │  Route      │                                          │
-│                    │  Handlers   │                                          │
-│                    └──────┬──────┘                                          │
-│                           │                                                 │
-│        ┌──────────────────┼──────────────────┐                              │
-│        ▼                  ▼                  ▼                              │
-│  ┌───────────┐     ┌──────────────┐     ┌──────────────┐                    │
-│  │  AI       │     │  CORE        │     │  EXTERNAL    │                    │
-│  │  SERVICE  │     │  SERVICES    │     │  SERVICES    │                    │
-│  │           │     │              │     │              │                    │
-│  │ OpenAI    │     │ Auth         │     │ WhatsApp     │                    │
-│  │ GPT-4o    │     │ (Supabase)   │     │ Business API │                    │
-│  │ Vision    │     │              │     │ (360dialog)  │                    │
-│  │ GPT-4o    │     │ Notifications│     │              │                    │
-│  │ Text      │     │ (Queue)      │     │              │                    │
-│  │ Whisper   │     │ File Storage │     │              │                    │
-│  │ (later)   │     │ (Supabase)   │     │              │                    │
-│  └───────────┘     └──────┬───────┘     └──────────────┘                    │
-│        │                  │                   │                             │
-│        └──────────────────┼───────────────────┘                             │
-│                           ▼                                                 │
-│                    ┌──────────────┐                                         │
-│                    │   DATABASE   │                                         │
-│                    │  PostgreSQL  │                                         │
-│                    │  (Supabase)  │                                         │
-│                    │              │                                         │
-│                    │  Real-time   │                                         │
-│                    │  subscriptions                                         │
-│                    └──────────────┘                                         │
+│                         SINGLE NEXT.JS APPLICATION                           │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │                          CLIENT LAYER                                 │   │
+│  │                                                                       │   │
+│  │  ┌──────────────────────┐  ┌──────────────────┐  ┌────────────────┐  │   │
+│  │  │   STAFF PWA          │  │   ADMIN DASHBOARD │  │  PUBLIC VIEW   │  │   │
+│  │  │   (Mobile-First)     │  │   (Desktop Web)   │  │  (Lightweight) │  │   │
+│  │  │                      │  │                   │  │                │  │   │
+│  │  │  Route: / (app)      │  │  Route: /overview │  │  Route:        │  │   │
+│  │  │                      │  │                   │  │  /t/[token]    │  │   │
+│  │  │  Front desk staff    │  │  Owner/Manager    │  │  View quote    │  │   │
+│  │  │  Technicians         │  │  Reports          │  │  Approve/Reject│  │   │
+│  │  │  Queue view          │  │  Catalog          │  │  Subscribe WA  │  │   │
+│  │  │  Assessment          │  │  Staff mgmt       │  │                │  │   │
+│  │  │                      │  │                   │  │                │  │   │
+│  │  │  PWA features:       │  │                   │  │                │  │   │
+│  │  │  Add to Home Screen  │  │                   │  │                │  │   │
+│  │  │  Service Worker      │  │                   │  │                │  │   │
+│  │  │  Offline support     │  │                   │  │                │  │   │
+│  │  │  WebAuthn biometrics │  │                   │  │                │  │   │
+│  │  └──────────┬───────────┘  └──────────┬────────┘  └───────┬────────┘  │   │
+│  │             │                         │                    │           │   │
+│  │             └─────────────┬───────────┴────────────────────┘           │   │
+│  │                           │                                             │   │
+│  │                    ┌──────┴──────┐                                      │   │
+│  │                    │  API LAYER  │                                      │   │
+│  │                    │  Next.js    │                                      │   │
+│  │                    │  Route      │                                      │   │
+│  │                    │  Handlers   │                                      │   │
+│  │                    └──────┬──────┘                                      │   │
+│  │                           │                                             │   │
+│  │        ┌──────────────────┼──────────────────┐                          │   │
+│  │        ▼                  ▼                  ▼                          │   │
+│  │  ┌───────────┐     ┌──────────────┐     ┌──────────────┐                │   │
+│  │  │  AI       │     │  CORE        │     │  EXTERNAL    │                │   │
+│  │  │  SERVICE  │     │  SERVICES    │     │  SERVICES    │                │   │
+│  │  │           │     │              │     │              │                │   │
+│  │  │ OpenAI    │     │ Auth         │     │ WhatsApp     │                │   │
+│  │  │ GPT-4o    │     │ (Supabase)   │     │ Business API │                │   │
+│  │  │ Vision    │     │              │     │ (360dialog)  │                │   │
+│  │  │ GPT-4o    │     │ Notifications│     │              │                │   │
+│  │  │ Text      │     │ (Queue)      │     │              │                │   │
+│  │  │ Whisper   │     │ File Storage │     │              │                │   │
+│  │  │           │     │ (Supabase)   │     │              │                │   │
+│  │  └───────────┘     └──────┬───────┘     └──────────────┘                │   │
+│  │        │                  │                   │                         │   │
+│  │        └──────────────────┼───────────────────┘                         │   │
+│  │                           ▼                                             │   │
+│  │                    ┌──────────────┐                                     │   │
+│  │                    │   DATABASE   │                                     │   │
+│  │                    │  PostgreSQL  │                                     │   │
+│  │                    │  (Supabase)  │                                     │   │
+│  │                    │              │                                     │   │
+│  │                    │  Real-time   │                                     │   │
+│  │                    │  subscriptions                                    │   │
+│  │                    └──────────────┘                                     │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Staff Notification Strategy
+
+Three layers, no native push notifications required:
+
+### Layer 1: Real-Time Queue (in-app, primary)
+```
+STAFF PWA OPEN ──▶ Supabase Realtime WS ──▶ New ticket appears in queue instantly
+                                           Status changes update live
+                                           Optional sound cue for new assignments
+```
+
+### Layer 2: WhatsApp Fallback (out-of-app)
+```
+TICKET ASSIGNED ──▶ 360dialog ──▶ WhatsApp msg to technician
+                                  "Tiket baru #D1-042: iPhone 14 Pro — Skrin Pecah."
+```
+
+### Layer 3: Web Push (future, v2+)
+```
+APP CLOSED ──▶ Service Worker ──▶ Web Push notification
+                                  (iOS Safari 16.4+, Chrome)
 ```
 
 ## Data Flow: Graduated Intake (3 Tiers)
@@ -60,9 +98,9 @@
 STAFF     ──▶   TAP 🎤   ──▶   SPEAK    ──▶   AI        ──▶   CONFIRM   ──▶   TICKET
 OPENS           MIC          "iPhone          PARSE         (1 tap)         CREATED
 APP             BUTTON        14 Pro,         VOICE TO                      (auto-
-                              skrin           FIELDS                        approved)
-                              pecah,
-                              RM350"
+(WEB)                         skrin           FIELDS                        approved)
+                              pecah,         (Whisper +
+                              RM350"         GPT-4o)
 ```
 
 ### Tier 2: Quick Repair (<10 seconds)
@@ -71,24 +109,24 @@ APP             BUTTON        14 Pro,         VOICE TO                      (aut
 STAFF     ──▶   TYPE     ──▶   SELECT   ──▶   TAP       ──▶   TICKET
 OPENS          "iPh..."        "Skrin         QUICK            CREATED
 APP            (3 chars)       Pecah"         SUBMIT           (auto-
-                → iPhone       (top-10        (price           approved,
-                14 Pro         common         auto-filled      in_progress)
-                auto-match)    issues)        from catalog)
+               → iPhone        (top-10        (price           approved,
+               14 Pro          common         auto-filled      in_progress)
+               auto-match)     issues)        from catalog)
 ```
 
-### Tier 3: Full AI Intake (30-90 seconds) — existing flow
+### Tier 3: Full AI Intake (30-90 seconds)
 
 ```
 STAFF     ──▶   PHOTO   ──▶   AI     ──▶   MATCH   ──▶   TICKET
 OPENS          CAPTURE       VISION        CATALOG        CREATED
 APP                           API
-                              │
+(WEB)                         │
 CUSTOMER  ◀──  WHATSAPP  ◀──  NOTIF   ◀──  SAVE    ◀────┘
 GETS            API            SERVICE       TO DB
-WHATAPP
+WHATSAPP
 ```
 
-## Data Flow: Payment & Receipt (at Completion)
+## Data Flow: Payment & Receipt
 
 ```
 TECH       ──▶   TAP        ──▶   PAYMENT   ──▶   CONFIRM   ──▶   PARTS
@@ -108,7 +146,6 @@ COMPLETE         (status:         SLIDES UP       (cash/QR/       INVENTORY
                                     │ SENT      │              │ (scan to    │
                                     └───────────┘              │  subscribe) │
                                                                └─────────────┘
-
 ```
 
 ## Data Flow: Technician Assessment
@@ -117,28 +154,30 @@ COMPLETE         (status:         SLIDES UP       (cash/QR/       INVENTORY
 TECH      ──▶   OPEN    ──▶   AI       ──▶   TECH     ──▶   SAVE     ──▶   WHATSAPP
 OPENS           TICKET         DIAGNOSE        SELECTS        ASSESS          TO CUST
 QUEUE                          API             DIAGNOSIS      MENT            (QUOTE)
+(WEB)
 
                                                                                    │
                                                                           ┌────────┴────────┐
                                                                           │ CUSTOMER         │
                                                                           │ REPLIES YES/NO   │
+                                                                          │ (WhatsApp)       │
                                                                           └─────────────────┘
 ```
 
-## Real-Time Queue (Month 3+)
+## Real-Time Queue
 
-Supabase Realtime broadcasts ticket status changes to all connected clients:
+Supabase Realtime broadcasts ticket status changes to all connected PWA clients:
 
 ```
 ┌─────────────────┐         ┌──────────────────┐         ┌─────────────────┐
 │  TECHNICIAN     │◀────────│    SUPABASE      │◀────────│   FRONT DESK    │
 │  PHONE          │  WS PUSH│    REALTIME      │  UPDATE │   CREATES       │
-│  (listens)      │         │  (Postgres       │         │   TICKET        │
-│                 │         │   changes)       │         │                 │
+│  (PWA, listens) │         │  (Postgres       │         │   TICKET        │
+│                 │         │   changes)       │         │   (PWA)         │
 └─────────────────┘         └──────────────────┘         └─────────────────┘
 ```
 
-## Role-Aware Unified Flow (Updated)
+## Role-Aware Unified Flow
 
 Any user can advance a ticket through any state based on their role.
 Quick Repair and Voice Intake tickets skip assessment and auto-approve.
@@ -191,3 +230,5 @@ When a technician handles intake directly, the flow adapts to how well they alre
 4. **File storage separation**: Photos stored in Supabase Storage, DB holds URLs only.
 5. **Idempotent notifications**: WhatsApp message deduplication via external_message_id.
 6. **Graceful degradation**: If AI API is down, fall back to manual device selection and diagnosis entry.
+7. **PWA-first**: Single codebase serves staff app, admin dashboard, and public views. Service Worker enables offline use.
+8. **WhatsApp as notification channel**: Both customer and staff notifications via WhatsApp. No push notification infrastructure needed.

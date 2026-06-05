@@ -3,7 +3,13 @@
 
 ---
 
-# Mobile App — Flows & Screens
+# Staff PWA — Flows & Screens
+
+> **Revision (June 2025):** Staff app is now a Next.js PWA, not Expo React Native.
+> All flows, screens, and interactions below remain the same. Implementation uses
+> Tailwind CSS v4 + shadcn/ui in a mobile-first responsive layout instead of
+> NativeWind + RN Reusables. Camera uses `<input capture>` or `getUserMedia`.
+> See `02b-revised-pwa-plan.md` for full rationale.
 
 ## App Entry & Auth
 
